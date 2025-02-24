@@ -109,7 +109,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
 
     /**
      * This function calculates the probability of transitioning between 2 sequences states in given evolutionary time (distance)
-     * (with potentially multiple edits having happened)
+     * (with potentially multiple edits having happened), on internal branches of a tree
      *
      * @param startSequence  is a sequence state at a parent node
      * @param endSequence is a sequence state at a child node
@@ -142,7 +142,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
       }
 
         else {
-            //normal starting state:
+            //normal state (neither lost nor missing):
             if(endState.equals(missingState)) {
                 //normal -> WC this is the probability of not getting lost * 1.0
                 return Math.exp(-missingRate * distance);
@@ -204,7 +204,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
 
     /**
      * This function calculates the probability of transitioning between 2 sequences states in given evolutionary time (distance)
-     * (with potentially multiple edits having happened)
+     * (with potentially multiple edits having happened),on on tip edges of a tree
      *
      * @param startSequence  is a sequence state at a parent node
      * @param endSequence is a sequence state at a child node
@@ -218,9 +218,11 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
         if(startState.equals(lostState)) {
 
             if(endState.equals(missingState)) {
+                //a barcode that was lost will be missing after sequencing (dropout) automatically
                 return 1.0;
             }
-            else if (endState.equals(lostState)) {
+             if (endState.equals(lostState)) {
+                 //a barcode that was lost will be missing after sequencing (dropout) automatically
                 return 1.0;
             }
 
@@ -229,12 +231,13 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
         else if(startState.equals(missingState)) {
 
             if(endState.equals(missingState)) {
-                return (1 - Math.exp(- missingRate * distance )) + ( Math.exp(- missingRate * distance )  * missingProbability) ;
+                //a WC state will be missing at tips by getting lost through heritable loss or by dropping out at sequencing
+                return  (1 - Math.exp(- missingRate * distance )) + ( Math.exp(- missingRate * distance )  * missingProbability) ;
             }
 
             else if(endState.equals(lostState)) {
-                //this could be zero
-                return 0.0;
+                //a WC state will be missing at tips by getting lost through heritable loss or by dropping out at sequencing
+                return  (1 - Math.exp(- missingRate * distance )) + ( Math.exp(- missingRate * distance )  * missingProbability) ;
 
             }
 
@@ -243,15 +246,17 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
 
         else {
             //normal start state
+
             if(endState.equals(missingState)) {
+                //a normal state will be missing at tips by getting lost through heritable loss or by dropping out at sequencing
                 return (1 - Math.exp(- missingRate * distance )) + ( Math.exp(- missingRate * distance )  * missingProbability) ;
             }
 
              if(endState.equals(lostState)) {
-                //this could be zero
-                return (1 - Math.exp(- missingRate * distance )*(1-missingProbability));
+                 //a normal state will be missing at tips by getting lost through heritable loss or by dropping out at sequencing
+                 return (1 - Math.exp(- missingRate * distance )) + ( Math.exp(- missingRate * distance )  * missingProbability) ;
 
-            }
+             }
 
             //create an unedited state to subtract from sequences to get only edited sites
             List<Integer> zero = Arrays.asList(0);
@@ -348,6 +353,22 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      */
     public double[] getInsertProbabilities() {
         return editProbs;
+    }
+
+    /**
+     * Function to obtain the dropout probability
+     *
+     */
+    public double getMissingProbability() {
+        return missingProbability;
+    }
+
+    /**
+     * Function to obtain heritable loss rate
+     *
+     */
+    public double getMissingRate() {
+        return missingRate;
     }
 
 

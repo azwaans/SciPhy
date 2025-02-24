@@ -78,6 +78,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
     private double originHeight;
     private double missingRate;
     private double missingProbability;
+    public int[] missingState;
 
     private String ancestralSeqStr;
 
@@ -112,6 +113,15 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             missingProbability = missingProbInput.get().getValue();
             Log.info.println("missing prob: " + missingProbability);
         }
+
+        // creating the missing state, encoded as an array of -1.
+        missingState = new int[] {
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        };
 
         grabDataType();
 
@@ -163,11 +173,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
 
             if(indicator < missingProb) {
                 //For now, use -1 as a alias for missing character
-                int[] missingBcode = new int[arrayLength];
-                for (int i = 0; i<arrayLength;i++) {
-                    missingBcode[i] = -1;
-                }
-                rootSequence = missingBcode;
+                rootSequence = missingState.clone();
 
             }
 
@@ -236,62 +242,62 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             // Draw characters on child sequence
             int[] childSequence = parentSequence.clone();
 
-            // find site where next insertion could happen, i.e. the next unedited state '0'
-            int insertionIndex = 0;
-            while ((insertionIndex < arrayLength) && (childSequence[insertionIndex] != 0)) {
-                insertionIndex++;
-            }
+           if(! childSequence.equals(missingState)) {
+               //if the bcode isn't missing already, proceed with simulation
 
-            if (insertionIndex == arrayLength) {
-                // then sequence is fully edited, no further simulation necessary
-                ;
-            } else {
+               //1st, check whether the barcode will go missing on the branch
+               double missingProb = 1 - Math.exp(-deltaT * missingRate * clockRate);
+               double indicator = Randomizer.nextDouble();
 
-                //see if the bcode goes missing
-                double missingProb = 1 - Math.exp(-deltaT * missingRate * clockRate);
-                double indicator = Randomizer.nextDouble();
+               if (indicator < missingProb) {
+                   //For now, use -1 as a alias for missing character
+                   int[] missingBcode = missingState.clone();
+                   childSequence = missingBcode;
 
-                if(indicator < missingProb) {
-                    //For now, use -1 as a alias for missing character
-                    int[] missingBcode = new int[arrayLength];
-                    for (int i = 0; i<arrayLength;i++) {
-                        missingBcode[i] = -1;
-                    }
-                    childSequence = missingBcode;
+               }
 
-                }
+               //if not missing, actuallly proceed with the normal simulation
+               else{
 
-                else {
-                    // sample number of new insertions
-                    int nPossibleInserts = arrayLength - insertionIndex;
-                    long nPotentialInserts = Randomizer.nextPoisson(deltaT * clockRate);
+               // find site where next insertion could happen, i.e. the next unedited state '0'
+               int insertionIndex = 0;
+               while ((insertionIndex < arrayLength) && (childSequence[insertionIndex] != 0)) {
+                   insertionIndex++;
+               }
 
-                    // Add potential inserts while there are still possible insertion positions
-                    while (nPossibleInserts > 0 && nPotentialInserts > 0) {
+                   if (insertionIndex == arrayLength) {
+                       // then sequence is fully edited, no further simulation necessary
+                       ;
+                   } else {
 
-                        int newInsertion = Randomizer.randomChoicePDF(transitionProbs) + 1;
-                        childSequence[insertionIndex] = newInsertion;
+                       // sample number of new insertions
+                       int nPossibleInserts = arrayLength - insertionIndex;
+                       long nPotentialInserts = Randomizer.nextPoisson(deltaT * clockRate);
 
-                        insertionIndex++;
-                        nPossibleInserts--;
-                        nPotentialInserts--;
-                    }
-                }
-            }
+                       // Add potential inserts while there are still possible insertion positions
+                       while (nPossibleInserts > 0 && nPotentialInserts > 0) {
+
+                           int newInsertion = Randomizer.randomChoicePDF(transitionProbs) + 1;
+                           childSequence[insertionIndex] = newInsertion;
+
+                           insertionIndex++;
+                           nPossibleInserts--;
+                           nPotentialInserts--;
+                       }
+
+                   }
+               }
+           }
 
             if (child.isLeaf()) {
 
                 //see if the bcode goes missing
-                double indicator = Randomizer.nextDouble();
+                 double indicator = Randomizer.nextDouble();
 
                 //replace the bcode with a missing character
                 if(indicator < missingProbability) {
                     //For now, use -1 as a alias for missing character
-                    int[] missingBcode = new int[arrayLength];
-                    for (int i = 0; i<arrayLength;i++) {
-                        missingBcode[i] = -1;
-                    }
-                    childSequence = missingBcode;
+                    childSequence = missingState.clone();
                 }
 
 
