@@ -1477,6 +1477,267 @@ public class SciPhyLikelihoodTest {
     }
 
     @Test
+    public void testLikelihood3TipOneMissingOnlyRate() {
+
+
+        String newick = "((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2.0)";
+
+        Sequence a = new Sequence("CHILD1", "?,?,?,?,?");
+        Sequence b = new Sequence("CHILD3", "0,0,0,0,0");
+        Sequence c = new Sequence("CHILD2", "?,?,?,?,?");
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "dataType", "integer");
+
+
+        Tree tree1 = new TreeParser();
+        tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
+                newick,
+                "adjustTipHeights", false, "offset", 0);
+
+        SciPhyTreeLikelihood likelihood = new SciPhyTreeLikelihood();
+
+        //create a sub model with values
+        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
+        RealParameter editprobs = new RealParameter("0.8 0.2");
+        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
+
+        //missingness parameters
+        RealParameter missRate = new RealParameter("1.0");
+        RealParameter missProbability = new RealParameter("0.0");
+
+        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
+                "missingRate",missRate,"missingProbability",missProbability);
+
+
+        //site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+
+
+        //likelihood class
+        RealParameter meanRate = new RealParameter("1.0");
+        StrictClockModel clockModel = new StrictClockModel();
+        clockModel.initByName("clock.rate", meanRate);
+        RealParameter origin = new RealParameter("3");
+        IntegerParameter arraylength = new IntegerParameter("5");
+
+
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+
+        //initialise partialLikelihoods
+        likelihood.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+
+
+
+        double LogPCalc = likelihood.calculateLogP();
+
+        //log((1-exp(-1))*(dpois(0,1)*exp(-1))*(dpois(0,1)*exp(-1))*((1-exp(-2)))*dpois(0,1)*exp(-1))
+        double calculatedOnR = -6.604089;
+        assertEquals(LogPCalc, calculatedOnR,0.00001);
+
+
+    }
+
+    @Test
+    public void testLikelihood3Tippn3MissingOnlyRate() {
+
+
+        String newick = "((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2.0)";
+
+        Sequence a = new Sequence("CHILD1", "?,?,?,?,?");
+        Sequence b = new Sequence("CHILD3", "0,0,0,0,0");
+        Sequence c = new Sequence("CHILD2", "0,0,0,0,0");
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "dataType", "integer");
+
+
+        Tree tree1 = new TreeParser();
+        tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
+                newick,
+                "adjustTipHeights", false, "offset", 0);
+
+        SciPhyTreeLikelihood likelihood = new SciPhyTreeLikelihood();
+
+        //create a sub model with values
+        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
+        RealParameter editprobs = new RealParameter("0.8 0.2");
+        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
+
+        //missingness parameters
+        RealParameter missRate = new RealParameter("1.0");
+        RealParameter missProbability = new RealParameter("0.0");
+
+        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
+                "missingRate",missRate,"missingProbability",missProbability);
+
+
+        //site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+
+
+        //likelihood class
+        RealParameter meanRate = new RealParameter("1.0");
+        StrictClockModel clockModel = new StrictClockModel();
+        clockModel.initByName("clock.rate", meanRate);
+        RealParameter origin = new RealParameter("3");
+        IntegerParameter arraylength = new IntegerParameter("5");
+
+
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+
+        //initialise partialLikelihoods
+        likelihood.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+
+
+
+        double LogPCalc = likelihood.calculateLogP();
+
+        //og((1-exp(-1))*(dpois(0,1)*exp(-1))*(dpois(0,1)*exp(-1))*dpois(0,2)*exp(-2)*dpois(0,1)*exp(-1))
+        double calculatedOnR =  -10.45868;
+        assertEquals(LogPCalc, calculatedOnR,0.00001);
+
+
+    }
+
+    @Test
+    public void testLikelihood3TipallMissingOnlyRate() {
+
+
+        String newick = "((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2.0)";
+
+        Sequence a = new Sequence("CHILD1", "?,?,?,?,?");
+        Sequence b = new Sequence("CHILD3", "?,?,?,?,?");
+        Sequence c = new Sequence("CHILD2", "?,?,?,?,?");
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "dataType", "integer");
+
+
+        Tree tree1 = new TreeParser();
+        tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
+                newick,
+                "adjustTipHeights", false, "offset", 0);
+
+        SciPhyTreeLikelihood likelihood = new SciPhyTreeLikelihood();
+
+        //create a sub model with values
+        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
+        RealParameter editprobs = new RealParameter("0.8 0.2");
+        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
+
+        //missingness parameters
+        RealParameter missRate = new RealParameter("1.0");
+        RealParameter missProbability = new RealParameter("0.0");
+
+        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
+                "missingRate",missRate,"missingProbability",missProbability);
+
+
+        //site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+
+
+        //likelihood class
+        RealParameter meanRate = new RealParameter("1.0");
+        StrictClockModel clockModel = new StrictClockModel();
+        clockModel.initByName("clock.rate", meanRate);
+        RealParameter origin = new RealParameter("3");
+        IntegerParameter arraylength = new IntegerParameter("5");
+
+
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+
+        //initialise partialLikelihoods
+        likelihood.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+
+
+
+        double LogPCalc = likelihood.calculateLogP();
+
+        //log(((dpois(0,1)*exp(-1))*(dpois(0,1)*exp(-1))*(dpois(0,1)*exp(-1))*((1-exp(-2)))*dpois(0,1)*exp(-1)
+        double calculatedOnR = -0.4586751;
+        assertEquals(LogPCalc, calculatedOnR,0.00001);
+
+
+    }
+
+
+    @Test
+    public void testLikelihood3TipNoMissingOnlyRate() {
+
+
+        String newick = "((CHILD1:1,CHILD3:1)INTERNAL:1,CHILD2:2.0)";
+
+        Sequence a = new Sequence("CHILD1", "0,0,0,0,0");
+        Sequence b = new Sequence("CHILD3", "0,0,0,0,0");
+        Sequence c = new Sequence("CHILD2", "0,0,0,0,0");
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "sequence", b, "sequence", c, "dataType", "integer");
+
+
+        Tree tree1 = new TreeParser();
+        tree1.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
+                newick,
+                "adjustTipHeights", false, "offset", 0);
+
+        SciPhyTreeLikelihood likelihood = new SciPhyTreeLikelihood();
+
+        //create a sub model with values
+        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
+        RealParameter editprobs = new RealParameter("0.8 0.2");
+        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        Frequencies frequencies = new Frequencies();
+        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
+
+        //missingness parameters
+        RealParameter missRate = new RealParameter("1.0");
+        RealParameter missProbability = new RealParameter("0.0");
+
+        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
+                "missingRate",missRate,"missingProbability",missProbability);
+
+
+        //site model
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+
+
+        //likelihood class
+        RealParameter meanRate = new RealParameter("1.0");
+        StrictClockModel clockModel = new StrictClockModel();
+        clockModel.initByName("clock.rate", meanRate);
+        RealParameter origin = new RealParameter("3");
+        IntegerParameter arraylength = new IntegerParameter("5");
+
+
+        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+
+        //initialise partialLikelihoods
+        likelihood.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+
+
+
+        double LogPCalc = likelihood.calculateLogP();
+
+        //log((1-exp(-1))
+        double calculatedOnR = -12;
+        assertEquals(LogPCalc, calculatedOnR,0.00001);
+
+
+    }
+
+    @Test
     public void testLikelihoodCherryOneMissingOnlyRateOnlyLost() {
 
 
