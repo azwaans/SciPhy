@@ -4,7 +4,6 @@ package sciphy.evolution.likelihood;
 import java.util.*;
 
 import beast.base.core.Description;
-import beast.base.core.Log;
 import beast.base.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
@@ -18,7 +17,6 @@ import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeInterface;
-import beast.base.util.Randomizer;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import static sciphy.util.LogSum.logSum;
 
@@ -189,11 +187,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
                 return Double.NEGATIVE_INFINITY;
             }
         }
-//        double indicator = Randomizer.nextDouble();
-//        if(indicator  < 0.01) {
-//            return Double.NaN;
-//
-//        }
 
         for (int i = 0; i < m_siteModel.getCategoryCount(); i++) {
             //adjust clock rate for the given category
@@ -261,10 +254,10 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
      */
     protected void initLeafPartials(int nodeNr) {
 
-        double[] leafPartialLikelihoods = initPartialLikelihoodsLeaf(ancestralStates.get(makeCachingIndexStates(nodeNr)).size());
-        this.partialLikelihoods[0][nodeNr] = new double[leafPartialLikelihoods.length];
-        this.partialLikelihoods[1][nodeNr] = new double[leafPartialLikelihoods.length];
-        System.arraycopy(leafPartialLikelihoods, 0, this.partialLikelihoods[0][nodeNr], 0, leafPartialLikelihoods.length);
+            double[] leafPartialLikelihoods = initPartialLikelihoodsLeaf(ancestralStates.get(makeCachingIndexStates(nodeNr)).size());
+            this.partialLikelihoods[0][nodeNr] = new double[leafPartialLikelihoods.length];
+            this.partialLikelihoods[1][nodeNr] = new double[leafPartialLikelihoods.length];
+            System.arraycopy(leafPartialLikelihoods, 0, this.partialLikelihoods[0][nodeNr], 0, leafPartialLikelihoods.length);
 
     }
 
@@ -345,54 +338,23 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         List<List<Integer>> ancSetChild2 = ancestralStates.get(makeCachingIndexStates(child2Nr));
 
 
+        if (ancSetChild1.contains(lostState) || ancSetChild1.contains(missingState)) {
+            //the intersection is the child2 set
+            List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild2);
+            ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
+        }
+        else if (ancSetChild2.contains(lostState) ||  ancSetChild2.contains(missingState)) {
+            //the intersection is the child1 set
+            List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild1);
+            ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
+        }
+        else {
+            //intersection needs to be computed
+            List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild1);
+            ancSetNode.retainAll(ancSetChild2);
+            ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
 
-        // create the set of ancestral states for the missing state
-//        List<List<Integer>> ancestorsMissingLost = new ArrayList();
-//        ancestorsMissingLost.add(new ArrayList<>(missingState));
-//        ancestorsMissingLost.add(new ArrayList<>(lostState));
-//
-//        // create the set of ancestral states for the lost state
-//        List<List<Integer>> ancestorsLost = new ArrayList();
-//        ancestorsLost.add(new ArrayList<>(lostState));
-
-        // both sets are missing states, the intersection is the missing state
-        //todo rearrage these statements
-//        if( (ancSetChild2.equals(ancestorsMissingLost) && ancSetChild1.equals(ancestorsMissingLost)) || (ancSetChild2.equals(Lo) && ancSetChild1.equals(ancestorsMissingLost) ) ) {
-//            if(substitutionModel.getMissingProbability() == 0.0) {
-//                //when there is not missing probability, only the lost state is possible at internal nodes
-//                ancestralStates.put(makeCachingIndexStates(nodeNr), ancestorsLost);
-//            }
-//            else {
-//                //otherwise, both the lost state and the WC state are possible!
-//                ancestralStates.put(makeCachingIndexStates(nodeNr), ancestorsMissingLost);
-//            }
-//
-//        }
-//        else {
-
-            if (ancSetChild1.contains(lostState) || ancSetChild1.contains(missingState)) {
-                //the intersection is the child2 set
-                List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild2);
-                ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
-            }
-            else if (ancSetChild2.contains(lostState) ||  ancSetChild2.contains(missingState)) {
-                //the intersection is the child1 set
-                List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild1);
-                ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
-            }
-            else {
-                //intersection needs to be computed
-                List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild1);
-                ancSetNode.retainAll(ancSetChild2);
-                ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
-
-            }
-
-
-
-
-
-//        }
+        }
 
 
     }
@@ -518,10 +480,8 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         //possible ancestors of a missing state can be either the Wild-card state (aka, any non-lost state), or the barcode could have already been lost previously
         if(sequence.equals(missingState)) {
 
-             if ( substitutionModel.getMissingProbability() != 0.0) {
-                ancestors.add(new ArrayList<>(missingState));
-            }
-             if ( substitutionModel.getMissingRate() != 0.0) {
+            ancestors.add(new ArrayList<>(missingState));
+            if ( substitutionModel.getMissingRate() != 0.0) {
                 ancestors.add(new ArrayList<>(lostState));
             }
 
