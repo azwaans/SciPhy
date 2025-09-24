@@ -27,13 +27,13 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
 
     final public Input<RealParameter>  missingRateInput = new Input<>(
             "missingRate",
-            "Rate at which the barcode goes missing heritably (in reality a scaler from the clock rate)",
-            Input.Validate.OPTIONAL);
+            "Rate at which the barcode goes missing heritably (in reality a scaler from the clock rate). Default 0.0.",
+            new RealParameter("0.0"));
 
     final public Input<RealParameter>  missingProbInput = new Input<>(
             "missingProbability",
-            "Probability that a barcode goes missing at the tips",
-            Input.Validate.OPTIONAL);
+            "Probability that a barcode goes missing at the tips. Default 0.0",
+            new RealParameter("0.0"));
 
     /**
      * edit insertion rate  *
