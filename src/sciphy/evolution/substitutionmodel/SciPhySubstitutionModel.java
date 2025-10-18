@@ -57,25 +57,6 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
         editProbabilities = editProbabilitiesInput.get();
         editProbs = editProbabilities.getDoubleValues();
 
-
-        // creating the missing state, encoded as an array of -1.
-         missingState = new ArrayList<Integer>(){{
-            add(-1);
-            add(-1);
-            add(-1);
-            add(-1);
-            add(-1);
-        }};
-
-        lostState = new ArrayList<Integer>(){{
-            add(-2);
-            add(-2);
-            add(-2);
-            add(-2);
-            add(-2);
-        }};
-
-
         double insertProbabilitiesSum = Arrays.stream(editProbs).sum();
         if (Math.abs(insertProbabilitiesSum - 1.0) > 1e-6) {
             throw new IllegalArgumentException(String.format(

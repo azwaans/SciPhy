@@ -25,21 +25,9 @@ import static sciphy.util.LogSum.logSum;
 
 public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
-    private static List<Integer> missingState = new ArrayList<Integer>(){{
-        add(-1);
-        add(-1);
-        add(-1);
-        add(-1);
-        add(-1);
-    }}; ;
+    private static List<Integer> missingState = new ArrayList<Integer>();
 
-    private static List<Integer> lostState =  new ArrayList<Integer>(){{
-        add(-2);
-        add(-2);
-        add(-2);
-        add(-2);
-        add(-2);
-    }};;
+    private static List<Integer> lostState =  new ArrayList<Integer>();
 
 
     final public Input<RealParameter> originTimeInput = new Input<>("origin", "Duration of the experiment");
@@ -98,6 +86,13 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     @Override
     public void initAndValidate() {
         arrayLength = arrayLengthInput.get().getValue();
+        missingState = new ArrayList<>();
+        lostState = new ArrayList<>();
+        for (int i = 0; i < arrayLength; i++) {
+            missingState.add(-1);
+            lostState.add(-2);
+        }
+
         if (arrayLength < 1 || (dataInput.get().getSiteCount() != arrayLength)) {
             throw new IllegalArgumentException(String.format(
                     "Invalid array length: Ensure that length >= 1 and matches alignment "));
@@ -111,6 +106,8 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         categoryLogLikelihoods = new double[m_siteModel.getCategoryCount()];
         m_siteModel.setDataType(dataInput.get().getDataType());
         substitutionModel = (SciPhySubstitutionModel) m_siteModel.substModelInput.get();
+        substitutionModel.missingState = missingState;
+        substitutionModel.lostState = lostState;
 
         m_branchLengths = new double[nodeCount];
         storedBranchLengths = new double[nodeCount];
