@@ -25,9 +25,7 @@ import static sciphy.util.LogSum.logSum;
 
 public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
-    private static List<Integer> missingState = new ArrayList<Integer>();
 
-    private static List<Integer> lostState =  new ArrayList<Integer>();
 
 
     final public Input<RealParameter> originTimeInput = new Input<>("origin", "Duration of the experiment");
@@ -43,7 +41,9 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     protected double originTime;
     protected int nodeCount;
     protected int arrayLength;
-
+    protected List<Integer> missingState;
+    protected List<Integer> lostState;
+    protected List<Integer> uneditedState;
 
     /**
      * flag to indicate the
@@ -88,9 +88,11 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         arrayLength = arrayLengthInput.get().getValue();
         missingState = new ArrayList<>();
         lostState = new ArrayList<>();
+        uneditedState = new ArrayList<>();
         for (int i = 0; i < arrayLength; i++) {
             missingState.add(-1);
             lostState.add(-2);
+            uneditedState.add(0);
         }
 
         if (arrayLength < 1 || (dataInput.get().getSiteCount() != arrayLength)) {
@@ -176,8 +178,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     @Override
     public double calculateLogP() {
         final TreeInterface tree = treeInput.get();
-
-
 
         if(originTime != 0.0) {
             if (tree.getRoot().getHeight() >= originTime) {
@@ -398,8 +398,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     public double calculateOriginPartial(Node rootNode, int categoryId) {
 
         //the start state is the unedited sciphy barcode
-        List<Integer> startState = Arrays.asList(0, 0, 0, 0, 0);
-        double partialAtOrigin = calculatePartialLikelihoodState(startState, rootNode, categoryId);
+        double partialAtOrigin = calculatePartialLikelihoodState(uneditedState, rootNode, categoryId);
         return partialAtOrigin;
 
     }
@@ -416,18 +415,22 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         double statePartialLikelihood = 0;
         final double jointBranchRate = m_siteModel.getRateForCategory(categoryId, childNode) * branchRate;
         double distance;
+        double lossDistance;
 
         //initialise evolutionary distance
         if (childNode.isRoot()) {
             distance = (originTime - childNode.getHeight()) * jointBranchRate;
+            lossDistance = (originTime - childNode.getHeight());
         } else {
             distance = childNode.getLength() * jointBranchRate;
+            lossDistance = childNode.getLength();
         }
+
         // calculate partials
         if (childNode.isLeaf()) {
 
             List<Integer> endState = ancestralStates.get(makeCachingIndexStates(childNode.getNr())).get(0);
-            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, this.arrayLength);
+            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, lossDistance,this.arrayLength);
 
         } else {
 
@@ -438,7 +441,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
                 // if the end state has non-null partial likelihood
                 if (partialLikelihoods[currentPartialsIndex[childNode.getNr()]][childNode.getNr()][endStateIndex] != 0.0) {
 
-                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, this.arrayLength) *
+                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, lossDistance,this.arrayLength) *
                             partialLikelihoods[currentPartialsIndex[childNode.getNr()]][childNode.getNr()][endStateIndex];
 
                 }

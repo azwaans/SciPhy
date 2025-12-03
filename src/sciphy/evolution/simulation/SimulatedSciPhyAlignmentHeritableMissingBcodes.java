@@ -115,6 +115,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
         }
 
         // creating the missing state, encoded as an array of -1.
+        //todo: make this flexible in array length
         missingState = new int[] {
             -1,
             -1,
@@ -168,7 +169,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             int nPossibleInserts = arrayLength;
 
             //see if the bcode goes missing
-            double missingProb = 1 - Math.exp(-deltaT * missingRate * clockRate );
+            double missingProb = 1 - Math.exp(-deltaT * missingRate  );
             double indicator = Randomizer.nextDouble();
 
             if(indicator < missingProb) {
@@ -246,7 +247,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
                //if the bcode isn't missing already, proceed with simulation
 
                //1st, check whether the barcode will go missing on the branch
-               double missingProb = 1 - Math.exp(-deltaT * missingRate * clockRate);
+               double missingProb = 1 - Math.exp(-deltaT * missingRate );
                double indicator = Randomizer.nextDouble();
 
                if (indicator < missingProb) {

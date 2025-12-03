@@ -92,7 +92,7 @@ public class SciPhySubstModelTest {
 
         org.apache.commons.math.distribution.PoissonDistribution dist = new PoissonDistributionImpl(0.5);
         Double expectedProbability = dist.probability(1) * 0.2 ;
-        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5,targetBClength);
 
 
         // Assert
@@ -123,7 +123,7 @@ public class SciPhySubstModelTest {
         List<Integer> sequence_a = alignment.getCounts().get(0);
         List<Integer> sequence_b = alignment.getCounts().get(1);
 
-        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5, targetBClength);
         Double expectedProbability = 0.6065306597126334;
 
         assertEquals(expectedProbability, calculatedProbability, 1e-10);
@@ -155,7 +155,7 @@ public class SciPhySubstModelTest {
         List<Integer> sequence_a = alignment.getCounts().get(0);
         List<Integer> sequence_b = alignment.getCounts().get(1);
 
-        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5, targetBClength);
         // expectedProbability : draw 1 event on a Poisson process, with event frequency 0.8
         // P(1) * 0.8
         Double expectedProbability = 0.2426122638850534;
@@ -191,7 +191,7 @@ public class SciPhySubstModelTest {
         List<Integer> sequence_a = alignment.getCounts().get(0);
         List<Integer> sequence_b = alignment.getCounts().get(1);
 
-        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5, targetBClength);
 
         // expectedProbability : draw 2 events on a Poisson process, with event probabilities 0.8 and 0.2 resp
         // P(2) * 0.8 * 0.2
@@ -225,7 +225,7 @@ public class SciPhySubstModelTest {
         List<Integer> sequence_a = alignment.getCounts().get(0);
         List<Integer> sequence_b = alignment.getCounts().get(1);
 
-        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5, targetBClength);
 
         // expectedProbability : draw 3 events on a Poisson process bounded to 3:
         // with event frequency 0.8, 0.2
@@ -260,7 +260,7 @@ public class SciPhySubstModelTest {
         List<Integer> sequence_a = alignment.getCounts().get(0);
         List<Integer> sequence_b = alignment.getCounts().get(1);
 
-        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5, targetBClength);
 
         Double expectedProbability = 1.0;
 
@@ -295,7 +295,7 @@ public class SciPhySubstModelTest {
 
 
         Double expectedProbability = 1.0;
-        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a, sequence_b, 0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a,sequence_b,0.5,0.5, targetBClength);
 
 
         // Assert
@@ -330,7 +330,7 @@ public class SciPhySubstModelTest {
 
 
         Double expectedProbability = 1.0;
-        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a, sequence_b, 0.5, targetBClength);
+        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a,sequence_b,0.5,0.5, targetBClength);
 
 
         // Assert
@@ -364,7 +364,7 @@ public class SciPhySubstModelTest {
 //        List<Integer> sequence_a = alignment.getCounts().get(0);
 //        List<Integer> sequence_b = alignment.getCounts().get(1);
 //
-//        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a, sequence_b,0.5, targetBClength);
+//        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a, sequence_b,0.5,0.5, targetBClength);
 //
 //        Double expectedProbability = 0.0;
 //

@@ -1395,12 +1395,12 @@ public class SciPhyLikelihoodTest {
         List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
         double clockRate = 0.5;
 
-        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5);
-        double partial1000Internal = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5);
-        double partial1200Internal = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5);
+        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5, 5);
+        double partial1000Internal = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5, 5);
+        double partial1200Internal = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5, 5);
 
         //root node
-        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5) + partial1200Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5);
+        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) + partial1000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5) + partial1200Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5);
 
         //loglikelihood
         double LogPExpected = Math.log(partialOrigin);
@@ -1800,7 +1800,7 @@ public class SciPhyLikelihoodTest {
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
         List<Integer> allele00 = Arrays.asList(0, 0, 0, 0, 0);
 
-        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbability(allele00, alleleLost, 1, 5) ;
+        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbability(allele00, alleleLost, 1,1, 5) ;
         assertEquals(Math.log(partial00000Internal1), calculatedOnR,0.00001);
 
 
@@ -1875,34 +1875,34 @@ public class SciPhyLikelihoodTest {
 
 
         //internal1 is the node connecting Child1 and Child3
-        double partial12000Internal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 5);
-        double partial12000Internal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 1 * clockRate, 5);
+        double partial12000Internal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 1, 5);
+        double partial12000Internal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 1 * clockRate, 1, 5);
 
         double partial12000Internal1 = partial12000Internal1Left * partial12000Internal1Right;
 
 
-        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 5);
-        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 5);
+        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 1, 5);
+        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 1, 5);
 
-        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate, 5)* partial12000Internal1 +
-                                        substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                                        substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                                        (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5));
+        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
+                                        substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                                        substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                                        (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5, 5));
 
-        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate, 5)* partial12000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5));
+        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5, 5));
 
-        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate, 5)* partial12000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5));
+        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5, 5));
 
 
-        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)* partial12000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5)* partial00000Internal2);
+        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)* partial12000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5)* partial00000Internal2);
 
         double LogPExpected = Math.log(partial00000Root);
         double LogPCalc = likelihood.calculateLogP();
@@ -1974,20 +1974,20 @@ public class SciPhyLikelihoodTest {
         double missingRate = 0.0;
 
         //internal1 is the node connecting Child1 and Child3
-        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele1, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 5);
-        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele1, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 5);
+        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele1, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 1, 5);
+        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele1, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 1, 5);
 
-        double partial00000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele1, 5 * clockRate, 5));
+        double partial00000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele1, 5 * clockRate, 5, 5));
 
-        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele1, 5 * clockRate, 5));
+        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele1, 5 * clockRate, 5, 5));
 
 
-        double partial00000Root = (substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5)* partial00000Internal2);
+        double partial00000Root = (substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5)* partial00000Internal2);
 
         double LogPExpected = Math.log(partial00000Root);
         double LogPCalc = likelihood.calculateLogP();
@@ -2060,33 +2060,33 @@ public class SciPhyLikelihoodTest {
         double clockRate = 0.5;
 
         //internal1 is the node connecting Child1 and Child3
-        double partial12000Internal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 5);
-        double partial12000Internal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleLost, 1 * clockRate, 5);
+        double partial12000Internal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 1, 5);
+        double partial12000Internal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleLost, 1 * clockRate, 1, 5);
 
         double partial12000Internal1 = partial12000Internal1Left * partial12000Internal1Right;
 
-        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleLost, 1 * clockRate, 5);
-        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleLost, 1 * clockRate, 5);
+        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleLost, 1 * clockRate, 1, 5);
+        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleLost, 1 * clockRate, 1, 5);
 
-        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate, 5)* partial12000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5));
+        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5, 5));
 
-        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate, 5)* partial12000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5));
+        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5, 5));
 
-        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate, 5)* partial12000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate, 5)* partial10000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate, 5)* partial00000Internal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5));
+        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate,4, 5)* partial00000Internal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5, 5));
 
 
-        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)* partial12000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5)* partial00000Internal2);
+        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)* partial12000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5)* partial00000Internal2);
 
         double LogPExpected = Math.log(partial00000Root);
         double LogPCalc = likelihood.calculateLogP();
@@ -2161,38 +2161,38 @@ public class SciPhyLikelihoodTest {
         double missingProbability = 0.5;
 
         //internal1 is the node connecting Child1 and Child3
-        double partialWCInternal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5);
-        double partialWCInternal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5);
+        double partialWCInternal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5);
+        double partialWCInternal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5);
 
-        double manualPartialWCInternal1 = ((1- Math.exp(- missingRate * clockRate)) + Math.exp(- missingRate * clockRate) * missingProbability) * ((1- Math.exp(- missingRate * clockRate)) + Math.exp(- missingRate * clockRate) * missingProbability);
+        double manualPartialWCInternal1 = ((1- Math.exp(- missingRate )) + Math.exp(- missingRate ) * missingProbability) * ((1- Math.exp(- missingRate )) + Math.exp(- missingRate ) * missingProbability);
         double partialmanualWCInternal1 = partialWCInternal1Left * partialWCInternal1Right;
         assertEquals(manualPartialWCInternal1, partialmanualWCInternal1);
 
 
-        double partialWCInternal1 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5)) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5));
+        double partialWCInternal1 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5)) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5));
 
-        double partialLostInternal1 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 5)) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 5));
-
-
-
-        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, alleleWC, 4 * clockRate, 5)* partialWCInternal1 +
-                substitutionModel.getSequenceTransitionProbability(allele0, alleleLost, 4 * clockRate, 5)* partialLostInternal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5));
-
-        double partial10000Root =  (substitutionModel.getSequenceTransitionProbability(allele1, alleleWC, 4 * clockRate, 5)* partialWCInternal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, alleleLost, 4 * clockRate, 5)* partialLostInternal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5));
-
-        double partial12000Root =  (substitutionModel.getSequenceTransitionProbability(allele12, alleleWC, 4 * clockRate, 5)* partialWCInternal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, alleleLost, 4 * clockRate, 5)* partialLostInternal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5));
+        double partialLostInternal1 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 1, 5)) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 1, 5));
 
 
-        double partial00000Origin =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)* partial12000Root +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)* partial10000Root +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5)* partial00000Root);
+
+        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1 +
+                substitutionModel.getSequenceTransitionProbability(allele0, alleleLost, 4 * clockRate,4, 5)* partialLostInternal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5, 5));
+
+        double partial10000Root =  (substitutionModel.getSequenceTransitionProbability(allele1, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, alleleLost, 4 * clockRate,4, 5)* partialLostInternal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5, 5));
+
+        double partial12000Root =  (substitutionModel.getSequenceTransitionProbability(allele12, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, alleleLost, 4 * clockRate,4, 5)* partialLostInternal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5, 5));
+
+
+        double partial00000Origin =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)* partial12000Root +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)* partial10000Root +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5)* partial00000Root);
 
         double LogPExpected = Math.log(partial00000Origin);
         double LogPCalc = likelihood.calculateLogP();
@@ -2264,25 +2264,25 @@ public class SciPhyLikelihoodTest {
         double clockRate = 0.5;
 
         //internal1 is the node connecting Child1 and Child3
-        double partialWCInternal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5);
-        double partialWCInternal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5);
+        double partialWCInternal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5);
+        double partialWCInternal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5);
 
         double partialWCInternal1 = partialWCInternal1Left * partialWCInternal1Right;
 
 
-        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, alleleWC, 4 * clockRate, 5)* partialWCInternal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5));
+        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5, 5));
 
-        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, alleleWC, 4 * clockRate, 5)* partialWCInternal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5));
+        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele1, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5, 5));
 
-        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele12, alleleWC, 4 * clockRate, 5)* partialWCInternal1) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5));
+        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele12, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5, 5));
 
 
-        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)* partial12000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5)* partial00000Internal2);
+        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)* partial12000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5)* partial00000Internal2);
 
         double LogPExpected = Math.log(partial00000Root);
         double LogPCalc = likelihood.calculateLogP();
@@ -2360,46 +2360,46 @@ public class SciPhyLikelihoodTest {
 
         //Manual checks for the transition probability calculations
         double manualPartialWCInternal1 = ((1-Math.exp(-missingRate * clockRate)) + (Math.exp(-missingRate * clockRate)*missingProbability)) * (((1-Math.exp(-missingRate * clockRate)) + (Math.exp(-missingRate * clockRate)*missingProbability))) ;
-        double manualpartialWCInternal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5);
+        double manualpartialWCInternal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5);
         assertEquals(manualPartialWCInternal1, manualpartialWCInternal1);
 
         //Manual likelihood calculation relying on the sequenceTransitionProbability
-        double partialWCInternal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 5);
-        double partialLostInternal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 5);
+        double partialWCInternal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1 * clockRate, 1, 5);
+        double partialLostInternal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1 * clockRate, 1, 5);
 
 
-        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 5))*
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 5));
+        double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5))*
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5));
 
-        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 5))*
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 5));
+        double partial10000Internal2 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5))*
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5));
 
-        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 5))*
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 5));
+        double partial12000Internal2 =  (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 1, 5))*
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 1, 5));
 
 
 
-        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate, 5)* partial12000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate, 5)* partial00000Internal2) *
-                (substitutionModel.getSequenceTransitionProbability(allele0, alleleWC, 4 * clockRate, 5)* partialWCInternal1 +
-                substitutionModel.getSequenceTransitionProbability(allele0, alleleLost, 4 * clockRate, 5)* partialLostInternal1);
+        double partial00000Root =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate,4, 5)* partial12000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,4, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,4, 5)* partial00000Internal2) *
+                (substitutionModel.getSequenceTransitionProbability(allele0, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1 +
+                substitutionModel.getSequenceTransitionProbability(allele0, alleleLost, 4 * clockRate,4, 5)* partialLostInternal1);
 
-        double partial10000Root =  (substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate, 5)* partial12000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate, 5)* partial00000Internal2)  *
-                (substitutionModel.getSequenceTransitionProbability(allele1, alleleWC, 4 * clockRate, 5)* partialWCInternal1 +
-                        substitutionModel.getSequenceTransitionProbability(allele1, alleleLost, 4 * clockRate, 5)* partialLostInternal1);
+        double partial10000Root =  (substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate,4, 5)* partial12000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate,4, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate,4, 5)* partial00000Internal2)  *
+                (substitutionModel.getSequenceTransitionProbability(allele1, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1 +
+                        substitutionModel.getSequenceTransitionProbability(allele1, alleleLost, 4 * clockRate,4, 5)* partialLostInternal1);
 
-        double partial12000Root =  (substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate, 5)* partial12000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate, 5)* partial10000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate, 5)* partial00000Internal2)  *
-                (substitutionModel.getSequenceTransitionProbability(allele12, alleleWC, 4 * clockRate, 5)* partialWCInternal1 +
-                        substitutionModel.getSequenceTransitionProbability(allele12, alleleLost, 4 * clockRate, 5)* partialLostInternal1);
+        double partial12000Root =  (substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate,4, 5)* partial12000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate,4, 5)* partial10000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate,4, 5)* partial00000Internal2)  *
+                (substitutionModel.getSequenceTransitionProbability(allele12, alleleWC, 4 * clockRate,4, 5)* partialWCInternal1 +
+                        substitutionModel.getSequenceTransitionProbability(allele12, alleleLost, 4 * clockRate,4, 5)* partialLostInternal1);
 
-        double partial00000Origin =  (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5)* partial00000Root) +
-                (substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)* partial10000Root) +
-                        (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)* partial12000Root)  ;
+        double partial00000Origin =  (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5)* partial00000Root) +
+                (substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)* partial10000Root) +
+                        (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)* partial12000Root)  ;
 
         double LogPExpected = Math.log(partial00000Origin);
         double LogPCalc = likelihood.calculateLogP();
@@ -2468,12 +2468,12 @@ public class SciPhyLikelihoodTest {
         List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
         double clockRate = 0.5;
 
-        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate,5) * substitutionModel.getSequenceTransitionProbability(allele0, allele122, 5 * clockRate, 5);
-        double partial1000Internal = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele122, 5 * clockRate, 5);
-        double partial1200Internal = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate,5) * substitutionModel.getSequenceTransitionProbability(allele12, allele122, 5 * clockRate, 5);
+        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5,5) * substitutionModel.getSequenceTransitionProbability(allele0, allele122, 5 * clockRate, 5, 5);
+        double partial1000Internal = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele122, 5 * clockRate, 5, 5);
+        double partial1200Internal = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5,5) * substitutionModel.getSequenceTransitionProbability(allele12, allele122, 5 * clockRate, 5, 5);
 
         //root node
-        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5) + partial1200Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5);
+        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) + partial1000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5) + partial1200Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5);
 
         //loglikelihood
         double LogPExpected = Math.log(partialOrigin);
@@ -2554,34 +2554,34 @@ public class SciPhyLikelihoodTest {
         List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
         double clockRate = 0.5;
 
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele122, 1 * clockRate,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 5);
-        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele122, 1* clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 5);
-        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele122, 1 * clockRate,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 1 * clockRate, 5);
-        double partial1220Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele122, allele122, 1 * clockRate,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele122, alleleWC, 1 * clockRate, 5);
+        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele122, 1 * clockRate, 1,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 1, 5);
+        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele122, 1 * clockRate,1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 1, 5);
+        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele122, 1 * clockRate, 1,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 1 * clockRate, 1, 5);
+        double partial1220Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele122, allele122, 1 * clockRate, 1,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele122, alleleWC, 1 * clockRate, 1, 5);
 
         //root node
-        double partial0000Root = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,5) *  partial0000Internal1 +
-                                 substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,5) *  partial1000Internal1 +
-                                 substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate,5) *  partial1200Internal1 +
-                                 substitutionModel.getSequenceTransitionProbability(allele0, allele122, 4 * clockRate,5) *  partial1220Internal1) *
-                substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate,5);
+        double partial0000Root = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,4,5) *  partial0000Internal1 +
+                                 substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,4,5) *  partial1000Internal1 +
+                                 substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate,4,5) *  partial1200Internal1 +
+                                 substitutionModel.getSequenceTransitionProbability(allele0, allele122, 4 * clockRate,4,5) *  partial1220Internal1) *
+                substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 5 * clockRate, 5,5);
 
-        double partial1000Root = (substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate,5) *  partial0000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate,5) *  partial1000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate,5) *  partial1200Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele122, 4 * clockRate,5) *  partial1220Internal1) *
-                substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate,5);
+        double partial1000Root = (substitutionModel.getSequenceTransitionProbability(allele1, allele0, 4 * clockRate,4,5) *  partial0000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 4 * clockRate,4,5) *  partial1000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele12, 4 * clockRate,4,5) *  partial1200Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele122, 4 * clockRate,4,5) *  partial1220Internal1) *
+                substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 5 * clockRate, 5,5);
 
-        double partial1200Root = (substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate,5) *  partial0000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate,5) *  partial1000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate,5) *  partial1200Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele122, 4 * clockRate,5) *  partial1220Internal1) *
-                substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate,5);
+        double partial1200Root = (substitutionModel.getSequenceTransitionProbability(allele12, allele0, 4 * clockRate,4,5) *  partial0000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 4 * clockRate,4,5) *  partial1000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele12, 4 * clockRate,4,5) *  partial1200Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele122, 4 * clockRate,4,5) *  partial1220Internal1) *
+                substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 5 * clockRate, 5,5);
 
 
-        double partialOrigin = substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate,5) *  partial0000Root +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate,5) *  partial1000Root +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate,5) *  partial1200Root ;
+        double partialOrigin = substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1,5) *  partial0000Root +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1,5) *  partial1000Root +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1,5) *  partial1200Root ;
 
 
         //loglikelihood
@@ -2649,10 +2649,10 @@ public class SciPhyLikelihoodTest {
         List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, 0);
         double clockRate = 0.5;
 
-        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele0, 5 * clockRate,5) * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 5 * clockRate,5);
+        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele0, 5 * clockRate, 5,5) * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 5 * clockRate, 5,5);
 
         //root node
-        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate,5);
+        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1,5);
 
         //loglikelihood
         double LogPExpected = Math.log(partialOrigin);
@@ -2727,13 +2727,13 @@ public class SciPhyLikelihoodTest {
         List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
         double clockRate = 0.5;
 
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele0, 1 * clockRate,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate,5);
+        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele0, 1 * clockRate, 1,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 1,5);
 
         //root node
-        double partial0000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,5) * partial0000Internal1 )* substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele0, 5 * clockRate,5);
+        double partial0000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 4 * clockRate,4,5) * partial0000Internal1 )* substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele0, 5 * clockRate, 5,5);
 
         //loglikelihood
-        double partial0000Origin = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate,5) * partial0000Internal2 );
+        double partial0000Origin = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1,5) * partial0000Internal2 );
 
         double LogPExpected = Math.log(partial0000Origin);
 
@@ -2803,15 +2803,15 @@ public class SciPhyLikelihoodTest {
         double clockRate = 0.5;
 
 
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5);
-        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5);
+        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5);
+        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 1, 5);
 
-        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 5);
+        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 1, 5);
 
-        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5) + partial1200Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate, 5));
+        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5) + partial1200Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate,2, 5));
 
         //root node
-        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate, 5);
+        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate,2, 5);
 
         //loglikelihood
         double LogPExpected = Math.log(partialOrigin);
@@ -2886,33 +2886,33 @@ public class SciPhyLikelihoodTest {
         double clockRate = 0.5;
 
 
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 0.5 * clockRate,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 0.5 * clockRate, 5);
-        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 0.5* clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 0.5 * clockRate, 5);
-        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 0.5 * clockRate,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 0.5 * clockRate, 5);
+        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 0.5 * clockRate, 0.5,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 0.5 * clockRate, 0.5, 5);
+        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 0.5 * clockRate, 0.5, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 0.5 * clockRate, 0.5, 5);
+        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 0.5 * clockRate, 0.5,5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 0.5 * clockRate, 0.5, 5);
 
 
-        double partial0000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 0.5 * clockRate,5) * partial0000Internal1+
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 0.5 * clockRate,5) * partial1000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele12, 0.5 * clockRate,5) * partial1200Internal1)
-                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1.0 * clockRate,5);
+        double partial0000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 0.5 * clockRate, 0.5,5) * partial0000Internal1+
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 0.5 * clockRate, 0.5,5) * partial1000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele12, 0.5 * clockRate, 0.5,5) * partial1200Internal1)
+                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1.0 * clockRate,1.0,5);
 
-        double partial1000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele1, allele0, 0.5 * clockRate,5) * partial0000Internal1+
-                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 0.5 * clockRate,5) * partial1000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele1, allele12, 0.5 * clockRate,5) * partial1200Internal1)
-                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1.0 * clockRate,5);
+        double partial1000Internal2 = (substitutionModel.getSequenceTransitionProbability(allele1, allele0, 0.5 * clockRate, 0.5,5) * partial0000Internal1+
+                substitutionModel.getSequenceTransitionProbability(allele1, allele1, 0.5 * clockRate, 0.5,5) * partial1000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele1, allele12, 0.5 * clockRate, 0.5,5) * partial1200Internal1)
+                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1.0 * clockRate,1.0,5);
 
-        double partial1200Internal2 = (substitutionModel.getSequenceTransitionProbability(allele12, allele0, 0.5 * clockRate,5) * partial0000Internal1+
-                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 0.5 * clockRate,5) * partial1000Internal1 +
-                substitutionModel.getSequenceTransitionProbability(allele12, allele12, 0.5 * clockRate,5) * partial1200Internal1)
-                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1.0 * clockRate,5);
+        double partial1200Internal2 = (substitutionModel.getSequenceTransitionProbability(allele12, allele0, 0.5 * clockRate, 0.5,5) * partial0000Internal1+
+                substitutionModel.getSequenceTransitionProbability(allele12, allele1, 0.5 * clockRate, 0.5,5) * partial1000Internal1 +
+                substitutionModel.getSequenceTransitionProbability(allele12, allele12, 0.5 * clockRate, 0.5,5) * partial1200Internal1)
+                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1.0 * clockRate,1.0,5);
 
 
-        double partial0000Root = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1.0 * clockRate,5) * partial0000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1.0 * clockRate,5) * partial1000Internal2 +
-                substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1.0 * clockRate,5) * partial1200Internal2)
-                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele21, 2.0 * clockRate,5);
+        double partial0000Root = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1.0 * clockRate,1.0,5) * partial0000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1.0 * clockRate,1.0,5) * partial1000Internal2 +
+                substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1.0 * clockRate,1.0,5) * partial1200Internal2)
+                * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele21, 2.0 * clockRate,2.0,5);
 
-       double partial0000Origin = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2.0 * clockRate,5) * partial0000Root);
+       double partial0000Origin = (substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2.0 * clockRate,2.0,5) * partial0000Root);
 
 
 
@@ -2995,15 +2995,15 @@ public class SciPhyLikelihoodTest {
 //        double clockRate = 0.5;
 //
 //
-//        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5);
-//        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5);
+//        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5);
+//        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 1, 5);
 //
-//        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 5);
+//        double partial1200Internal1 = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 1 * clockRate, 1, 5);
 //
-//        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5) + partial1200Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate, 5));
+//        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5) + partial1200Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate,2, 5));
 //
 //        //root node
-//        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate, 5);
+//        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate,2, 5);
 //
 //        //loglikelihood
 //        double LogPExpected = Math.log(partialOrigin);
@@ -3077,14 +3077,14 @@ public class SciPhyLikelihoodTest {
         List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
         double clockRate = 0.5;
 
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele11, 1 * clockRate, 5);
-        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele11, 1 * clockRate, 5);
+        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele11, 1 * clockRate, 1, 5);
+        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele11, 1 * clockRate, 1, 5);
 
-        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate, 5));
+        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate,2, 5));
 
 
         //root node
-        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate, 5);
+        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate,2, 5);
 
         //loglikelihood
         double LogPExpected = Math.log(partialOrigin);
@@ -3163,29 +3163,29 @@ public class SciPhyLikelihoodTest {
 
 
 
-        double partial0000Internal0 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele11, 0.5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 0.5 * clockRate, 5)  ;
-        double partial1000Internal0 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele11, 0.5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 0.5 * clockRate, 5);
-        double partial1100Internal0 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele11, allele11, 0.5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 0.5 * clockRate, 5);
+        double partial0000Internal0 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele11, 0.5 * clockRate, 0.5, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 0.5 * clockRate, 0.5, 5)  ;
+        double partial1000Internal0 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele11, 0.5 * clockRate, 0.5, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 0.5 * clockRate, 0.5, 5);
+        double partial1100Internal0 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele11, allele11, 0.5 * clockRate, 0.5, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 0.5 * clockRate, 0.5, 5);
 
 
 
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 5) * (
-                partial0000Internal0 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 0.5 * clockRate, 5) +
-                partial1000Internal0 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 0.5 * clockRate, 5) +
-                partial1100Internal0* substitutionModel.getSequenceTransitionProbability(allele0, allele11, 0.5 * clockRate, 5)
+        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5) * (
+                partial0000Internal0 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 0.5 * clockRate, 0.5, 5) +
+                partial1000Internal0 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 0.5 * clockRate, 0.5, 5) +
+                partial1100Internal0* substitutionModel.getSequenceTransitionProbability(allele0, allele11, 0.5 * clockRate, 0.5, 5)
 
         );
-        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 5) * (
-                partial1000Internal0 * substitutionModel.getSequenceTransitionProbability(allele1, allele1, 0.5 * clockRate, 5) +
-                partial1100Internal0* substitutionModel.getSequenceTransitionProbability(allele1, allele11, 0.5 * clockRate, 5)) ;
+        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5) * (
+                partial1000Internal0 * substitutionModel.getSequenceTransitionProbability(allele1, allele1, 0.5 * clockRate, 0.5, 5) +
+                partial1100Internal0* substitutionModel.getSequenceTransitionProbability(allele1, allele11, 0.5 * clockRate, 0.5, 5)) ;
 
-        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) +
-                partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)) *
-                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele21, 2 * clockRate, 5));
+        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) +
+                partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)) *
+                (substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele21, 2 * clockRate,2, 5));
 
 
         //root node
-        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate, 5);
+        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate,2, 5);
 
         //loglikelihood
         double LogPExpected = Math.log(partialOrigin);
@@ -3196,6 +3196,35 @@ public class SciPhyLikelihoodTest {
         assertEquals(LogPExpected, LogPCalc);
 
     }
+
+
+    @Test
+    public void testHashesUsedForCachingPartialsAndStates() {
+
+        //test that the node index hashing strategy used for caching doesn't produce collisions
+        // here, we test the hashing for a tree of at most 2000 tips
+        int[] allHashes = new int[8000];
+        for (int i = 0; i < 4000; i++) {
+            int node = i + 1;
+            String forHashing = node + "" + 1 + ""+ node;
+            allHashes[i] = forHashing.hashCode();
+            String forHashing2 = node + "" + 0 + ""+ node;
+            allHashes[4000+i] = forHashing2.hashCode();
+        }
+
+        for (int i = 0; i < allHashes.length; i++) {
+            for (int j = i + 1; j < allHashes.length; j++) {
+                if (allHashes[i] == allHashes[j]) {
+                    Log.info.println("Contains duplicates! There is a collision in the Hashmap");
+                }
+            }
+        }
+        //no collision is found
+
+
+    }
+
+
 
 //    @Test
 //    public void testLikelihood3LeavesSameLengthInsertsAllDifferentERRORPROPAGATION() {
@@ -3257,14 +3286,14 @@ public class SciPhyLikelihoodTest {
 //        List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
 //        double clockRate = 0.5;
 //
-//        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele11, 1 * clockRate, 5);
-//        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele11, 1 * clockRate, 5);
+//        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele11, 1 * clockRate, 1, 5);
+//        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele11, 1 * clockRate, 1, 5);
 //
-//        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate, 5));
+//        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 1, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 1, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate,2, 5));
 //
 //
 //        //root node
-//        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate, 5);
+//        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate,2, 5);
 //
 //        //loglikelihood
 //        double LogPExpected = Math.log(partialOrigin);
