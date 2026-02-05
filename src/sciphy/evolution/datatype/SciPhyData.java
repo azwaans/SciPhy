@@ -22,6 +22,14 @@ public class SciPhyData extends Base {
 
     }
 
+    public void initAndValidate() {
+        //TODO split the string into list of strings
+        stateCount = -1;
+        mapCodeToStateSet = null;
+        codeLength = -1;
+        codeMap = null;
+    }
+
     @Override
     public String getTypeDescription() {
         return "SciphyData";

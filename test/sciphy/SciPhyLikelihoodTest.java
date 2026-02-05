@@ -118,8 +118,8 @@ public class SciPhyLikelihoodTest {
 
     }
 
-    @Test (expected = RuntimeException.class)
-    public void testExceptionForOriginSmallerThanTreeHeightInput() {
+    @Test
+    public void testMinusInfinityForOriginSmallerThanTreeHeightInput() {
         String newick = "(CHILD1:5,CHILD2:5)";
         Sequence a = new Sequence("CHILD1", "1,2,0,0,0");
         Sequence b = new Sequence("CHILD2", "1,2,0,0,0");
@@ -138,6 +138,7 @@ public class SciPhyLikelihoodTest {
         // this should fail
         sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", originNegative, "arrayLength", arraylength);
         double LogPCalc = sciphyLikelihood.calculateLogP();
+        assertEquals(Double.NEGATIVE_INFINITY, LogPCalc);
 
 
     }

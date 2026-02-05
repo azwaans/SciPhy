@@ -1,5 +1,6 @@
 package sciphy;
 
+import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.datatype.IntegerData;
 import beast.base.evolution.sitemodel.SiteModel;
@@ -8,13 +9,14 @@ import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
 import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
-import feast.fileio.AlignmentFromNexus;
+import beastfx.app.inputeditor.AlignmentImporter;
 import org.junit.Test;
-
-import static junit.framework.Assert.assertEquals;
-
 import sciphy.evolution.simulation.SimulatedSciPhyAlignment;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
+
+import java.io.File;
+
+import static junit.framework.Assert.assertEquals;
 
 public class SimulatedAlignmentTest {
 
@@ -23,7 +25,7 @@ public class SimulatedAlignmentTest {
     public void testSimulationOnCherry() {
 
         Integer sequenceLength = 1;
-        String outputFileName = "test/simAl.nexus";
+        String outputFileName = "test/simAl.sciphy";
         String newick = "((CHILD1:5,CHILD2:5)INTERNAL:1):0.0";
 
         Tree tree = new TreeParser();
@@ -48,7 +50,7 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        Randomizer.setSeed(1);
+        Randomizer.setSeed(2);
         SimulatedSciPhyAlignment simAlignment = new SimulatedSciPhyAlignment();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
@@ -59,18 +61,16 @@ public class SimulatedAlignmentTest {
                 "userDataType", integerData
         );
 
-        AlignmentFromNexus expectedAlignment = new AlignmentFromNexus();
-        expectedAlignment.initByName("fileName",
-                "test/sciphy/expectedAlignment.nexus",
-                "userDataType", integerData);
+        AlignmentImporter expectedAlignment = new sciphy.util.NexusImporter();
+        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("test/sciphy/expectedAlignment.sciphy")).get(0);
 
-
-        assertEquals(expectedAlignment.getSequenceAsString("CHILD1"),
+        assertEquals(alignment.getSequenceAsString("CHILD1"),
                 simAlignment.getSequenceAsString("CHILD1"));
 
-        assertEquals(expectedAlignment.getSequenceAsString("CHILD2"),
+        assertEquals(alignment.getSequenceAsString("CHILD2"),
                 simAlignment.getSequenceAsString("CHILD2"));
 
     }
+
 
 }

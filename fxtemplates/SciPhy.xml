@@ -1,0 +1,363 @@
+<beast version='2.0'
+       namespace='beast.app.beauti:beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.branchratemodel:beast.base.evolution.speciation:beast.base.evolution.tree.coalescent:beast.base.util:beast.base.math:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood:beast.evolution:beast.base.math.distributions:beastfx.app.inputeditor:beastfx.app.beauti'
+       templateinfo="Template for single cell analysis with SciPhy">
+
+    <map name='connect'>beastfx.app.inputeditor.BeautiConnector</map>
+    <map name='subtemplate'>beastfx.app.inputeditor.BeautiSubTemplate</map>
+    <map name='prior'>beast.base.inference.distribution.Prior</map>
+
+    <beauticonfig spec='BeautiConfig'
+                  inputLabelMap='beast.base.inference.MCMC.operator=Operators,
+	        beast.base.inference.MCMC.logger=Loggers'
+                  inlinePlugins ='beast.base.inference.MCMC.distribution,
+            beast.base.evolution.sitemodel.SiteModel.substModel,
+            beast.base.evolution.tree.coalescent.ExponentialGrowth,
+            beast.base.evolution.tree.coalescent.ConstantPopulation,
+            beast.base.evolution.tree.coalescent.Coalescent,
+            beast.base.inference.State.stateNode'
+                  collapsedPlugins ='beast.base.inference.MCMC.logger'
+                  suppressPlugins = 'beast.base.inference.MCMC.operator,
+    		beast.base.inference.MCMC.operatorschedule,
+	        beast.base.evolution.tree.coalescent.Coalescent.treeIntervals,
+	        beast.base.evolution.tree.coalescent.Coalescent.tree,
+	        beast.base.inference.MCMC.state,
+	        beast.base.inference.MCMC.distribution,
+	        beast.base.inference.MCMC.init,
+	        beast.base.evolution.speciation.BirthDeathGernhard08Model.treeIntervals,
+	        beast.base.evolution.speciation.BirthDeathGernhard08Model.tree,
+	        beast.base.evolution.speciation.BirthDeathGernhard08Model.sampleProbability,
+			beast.base.evolution.speciation.YuleModel.treeIntervals,
+			beast.base.evolution.speciation.YuleModel.useTipDates,
+			beast.base.evolution.speciation.YuleModel.tree,
+	        beast.base.evolution.tree.Tree,
+	        beast.base.evolution.tree.Tree.trait,
+	        beast.base.evolution.tree.Tree.taxa,
+	        beast.base.evolution.tree.Tree.taxonset,
+	        beast.base.evolution.tree.coalescent.RandomTree.trait,
+	        beast.base.evolution.tree.coalescent.RandomTree.initial,
+	        beast.base.evolution.tree.coalescent.RandomTree.taxa,
+	        beast.base.evolution.tree.coalescent.RandomTree.taxonset,
+	        beast.base.evolution.tree.coalescent.RandomTree.estimate,
+	        beast.base.evolution.tree.TreeParser.initial,
+	        beast.base.evolution.tree.TreeParser.taxa,
+	        beast.base.evolution.tree.TreeParser.taxonset,
+	        beast.base.evolution.tree.TreeParser.trait,
+	        beast.base.evolution.tree.TreeParser.estimate,
+	        beast.base.evolution.tree.ClusterTree.initial,
+	        beast.base.evolution.tree.ClusterTree.taxa,
+	        beast.base.evolution.tree.ClusterTree.taxonset,
+	        beast.base.evolution.tree.ClusterTree.trait,
+	        beast.base.evolution.tree.ClusterTree.estimate,
+	        beast.base.evolution.substitutionmodel.WAG.rates,
+	        beast.base.evolution.substitutionmodel.WAG.frequencies,
+	        beast.base.evolution.substitutionmodel.JTT.rates,
+	        beast.base.evolution.substitutionmodel.JTT.frequencies,
+	        beast.base.evolution.substitutionmodel.Blosum62.rates,
+	        beast.base.evolution.substitutionmodel.Blosum62.frequencies,
+	        beast.base.evolution.substitutionmodel.Dayhoff.rates,
+	        beast.base.evolution.substitutionmodel.Dayhoff.frequencies,
+	        beast.base.evolution.substitutionmodel.CPREV.rates,
+	        beast.base.evolution.substitutionmodel.CPREV.frequencies,
+	        beast.base.evolution.substitutionmodel.MTREV.rates,
+	        beast.base.evolution.substitutionmodel.MTREV.frequencies,
+	        beast.base.evolution.substitutionmodel.GTR.rates,
+	        beast.base.evolution.substitutionmodel.JukesCantor.frequencies,
+            beast.base.inference.distribution.Prior.x,
+            beast.base.evolution.tree.MRCAPrior.tree,
+            beast.base.evolution.tree.MRCAPrior.monophyletic,
+            beast.base.evolution.tree.MRCAPrior.taxonset,
+            beast.base.evolution.branchratemodel.UCRelaxedClockModel.tree,
+            beast.base.evolution.branchratemodel.UCRelaxedClockModel.rateCategories,
+			beast.base.evolution.branchratemodel.UCRelaxedClockModel.distr,
+            beast.base.evolution.branchratemodel.RandomLocalClockModel.tree,
+            beast.base.evolution.branchratemodel.RandomLocalClockModel.meanRate,
+            beast.base.evolution.branchratemodel.RandomLocalClockModel.indicators,
+            beast.base.evolution.operator.ScaleOperator.indicator,
+	        beast.base.inference.Operator.weight,
+            beast.base.inference.Logger.model,
+            beast.base.evolution.tree.coalescent.BayesianSkyline.treeIntervals,
+            beast.base.evolution.tree.coalescent.BayesianSkyline.groupSizes,
+            beast.base.evolution.tree.coalescent.BayesianSkyline.popSizes
+            '
+                  buttonLabelMap='beast.app.beauti.BeautiInitDlg.&gt;&gt; details=Edit parameters'
+    >
+        <!--disableMenus='Mode'-->
+
+        <panel spec='BeautiPanelConfig' panelname="Partitions" tiptext="Data Partitions"
+               path='distribution/distribution[id="likelihood"]/distribution/data'
+               hasPartitions="none" icon='2220.png.x' forceExpansion='FALSE'
+               type='beast.base.evolution.alignment.Alignment'
+        />
+        <mergepoint id='aux-partitions-panels'/>
+
+        <panel spec='BeautiPanelConfig' panelname="Tip Dates" tiptext="Allows to specify data that a taxon was sampled"
+               path='tree'
+               hasPartitions="Tree" icon='2.png.x' forceExpansion='TRUE'
+               isVisible='true'
+        />
+        <mergepoint id='aux-tipdates-panels'/>
+
+        <panel spec='BeautiPanelConfig' panelname="Site Model" tiptext="Site model and substitution model specifications"
+               path='siteModel'
+               hasPartitions="SiteModel" icon='3.png.x' forceExpansion='TRUE'
+        />
+        <mergepoint id='aux-sitemodel-panels'/>
+
+        <panel spec='BeautiPanelConfig' panelname="Clock Model" tiptext="Clock model"
+               path='branchRateModel'
+               hasPartitions="ClockModel" icon='4.png.x' forceExpansion='TRUE'
+        />
+        <mergepoint id='aux-clockmodel-panels'/>
+        <panel spec='BeautiPanelConfig' panelname="Initialization" tiptext="Initial state"
+               path='state/stateNode'
+               hasPartitions="none" icon='6.png.x' forceExpansion='TRUE_START_COLLAPSED'
+               isVisible='true'
+        />
+        <mergepoint id='aux-initilisation-panels'/>
+        <panel spec='BeautiPanelConfig' panelname="Priors" tiptext="Other priors"
+               path='distribution/distribution[id="prior"]/distribution'
+               hasPartitions="none" icon='7.png.x' forceExpansion='TRUE_START_COLLAPSED'
+               type='beast.base.inference.Distribution'
+        />
+        <mergepoint id='aux-priors-panels'/>
+
+        <panel spec='BeautiPanelConfig' panelname="Operators" tiptext="MCMC Operator details"
+               path='operator'
+               hasPartitions="none" icon='8.png.x' forceExpansion='TRUE_START_COLLAPSED'
+               isVisible='false'
+        />
+        <mergepoint id='aux-operators-panels'/>
+
+        <panel spec='BeautiPanelConfig' panelname="MCMC" tiptext="MCMC parameters"
+               path=''
+               hasPartitions="none" icon='9.png.x' forceExpansion='TRUE'
+        />
+        <mergepoint id='aux-panels'/>
+
+
+        <!--    		<alignmentProvider id="Add SciPhy Data" spec='beastfx.app.inputeditor.BeautiAlignmentProvider'-->
+        <!--                               template='@PartitionTemplate'/>-->
+        <alignmentProvider id="Add Alignment" spec='BeautiAlignmentProvider' template='@PartitionTemplate'/>
+
+        <partitiontemplate id='PartitionTemplate' spec='BeautiSubTemplate' class='sciphy.evolution.likelihood.SciPhyTreeLikelihood' mainid='mcmc'
+                           suppressInputs="sciphy.evolution.tree.startingTree.taxa,
+                                    sciphy.evolution.tree.startingTree.nodetype,
+                                    sciphy.evolution.tree.startingTree.trait,
+                                    sciphy.evolution.tree.startingTree.taxonset,
+                                    sciphy.evolution.substitutionmodel.SciPhySubstitutionModel.frequencies">
+
+            >
+
+            <![CDATA[
+             <!-- tree and its properties -->
+            <taxonset id='TaxonSet.$(n)' spec='beast.base.evolution.alignment.TaxonSet' alignment='@$(n)' />
+            <plugin spec='sciphy.evolution.tree.startingTree' id='Tree.t:$(n)' taxonset='@TaxonSet.$(n)'
+            taxa="@$(n)" scarringHeight="20" rootHeight="23"
+                       scarringDuration="5" sequencesAreClustered="false"/>
+
+<!--            <plugin spec='sciphy.evolution.tree.startingTree' id='StartingTree.t:$(n)' estimate='false' taxonset='@TaxonSet.$(n)' initial='@Tree.t:$(n)'-->
+<!--                       taxa="@$(n)" scarringHeight="20" rootHeight="23"-->
+<!--                       scarringDuration="5" sequencesAreClustered="false">-->
+
+<!--            </plugin>-->
+
+
+
+            <plugin id='TreeHeight.t:$(n)' spec='beast.base.evolution.tree.TreeHeightLogger' tree='@Tree.t:$(n)'/>
+
+            <logger id='treelog.t:$(n)' spec='beast.base.inference.Logger' logEvery="1000" fileName="$(filebase).trees" mode='tree'>
+	            <log id='TreeWithMetaDataLogger.t:$(n)' spec='beast.base.evolution.TreeWithMetaDataLogger' tree='@Tree.t:$(n)'>
+	            </log>
+            </logger>
+
+			<distribution id="SciPhyTreeLikelihood.$(n)" spec='sciphy.evolution.likelihood.SciPhyTreeLikelihood' tree='@Tree.t:$(n)'
+			arrayLength="5" useScaling="true">
+				<data spec="beast.base.evolution.alignment.Alignment" id='$(n)'>
+					<userDataType spec='beast.base.evolution.datatype.IntegerData' id='integerDataType.$(n)' />
+				</data>
+				<siteModel spec='SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
+						<proportionInvariant spec='parameter.RealParameter' id='proportionInvariant.s:$(n)' value='0.0' lower='0' upper='1' estimate='false'/>
+				        <mutationRate        spec='parameter.RealParameter' id='mutationRate.s:$(n)' value='1.0' estimate='false'/>
+				        <shape               spec='parameter.RealParameter' id='gammaShape.s:$(n)' value='1.0' estimate='false'/>
+                    <!-- SciPhy subst model -->
+					<substModel spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" id="SciPhySubstmodel.s:$(n)">
+					    <parameter id="editProbabilities.s:$(n)" name="editProbabilities" value="
+					    0.1 0.1 0.1 0.1 0.1
+					    0.1 0.1 0.1 0.1 0.025
+					    0.025 0.025 0.025"
+					    estimate="true" dimension="1"/>
+					    <frequencies id="freq" spec="beast.base.evolution.substitutionmodel.Frequencies"
+					    estimate="false" frequencies="1.0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+					</substModel>
+
+				</siteModel>
+				<branchRateModel id="StrictClock.c:$(n)" spec="beast.base.evolution.branchratemodel.StrictClockModel">
+					<parameter id="clockRate.c:$(n)" name="clock.rate" value="1.0" estimate='true'/>
+				</branchRateModel>
+				<parameter name='origin' id='experimentLength.$(n)' value='24.0' estimate='true'/>
+			</distribution>
+
+            <!-- default tree prior -->
+            <plugin spec='YuleModel' id="YuleModel.t:$(n)" tree='@Tree.t:$(n)'>
+                <parameter name='birthDiffRate' id="birthRate.t:$(n)" value='1.0' estimate='true'/>
+            </plugin>
+
+            <prior id='EditProbabilitiesPrior.s:$(n)' x='@editProbabilities.s:$(n)'>
+                <distr spec="beast.base.inference.distribution.Dirichlet" >
+                <parameter id="alpha.s:$(n)" name="alpha" value="
+                1.5 1.5 1.5 1.5 1.5
+                1.5 1.5 1.5 1.5 1.5
+                1.5 1.5 1.5" />
+                </distr>
+            </prior>
+
+            <prior id='ClockPrior.c:$(n)' x='@clockRate.c:$(n)'>
+                <distr spec="beast.base.inference.distribution.Uniform" upper='Infinity'/>
+            </prior>
+
+            <prior id='MutationRatePrior.s:$(n)' x='@mutationRate.s:$(n)'>
+                <distr spec="OneOnX"/>
+            </prior>
+            <prior id='YuleBirthRatePrior.t:$(n)' x='@birthRate.t:$(n)'>
+                <distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='Infinity'/>
+            </prior>
+            <prior id="OriginPrior.t:$(n)" x="@experimentLength.$(n)">
+                <distr spec="beast.base.inference.distribution.Uniform" lower='0' upper='Infinity'/>
+            </prior>
+            <prior id='GammaShapePrior.s:$(n)' x='@gammaShape.s:$(n)'>
+                <distr spec="beast.base.inference.distribution.Exponential" mean='1'/>
+            </prior>
+
+            <operator id='mutationRateScaler.s:$(n)' spec='ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@mutationRate.s:$(n)"/>
+            <operator id='originScaler.s:$(n)' spec='ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@experimentLength.$(n)"/>
+            <operator id='editProbabilitiesScaler.s:$(n)' spec='DeltaExchangeOperator' weight="4" parameter="@editProbabilities.s:$(n)" delta="0.1"/>
+            <operator id='gammaShapeScaler.s:$(n)' spec='ScaleOperator' scaleFactor="0.5" weight="0.1" parameter="@gammaShape.s:$(n)"/>
+
+            <operator id='allTipDatesRandomWalker.t:$(n)' spec='TipDatesRandomWalker' windowSize="1" weight="0" tree="@Tree.t:$(n)"/>
+
+            <operator id='YuleModelTreeScaler.t:$(n)' spec='ScaleOperator' scaleFactor="0.5" weight="3" tree="@Tree.t:$(n)"/>
+            <operator id='YuleModelTreeRootScaler.t:$(n)' spec='ScaleOperator' scaleFactor="0.5" weight="3" tree="@Tree.t:$(n)" rootOnly='true'/>
+            <operator id='YuleModelUniformOperator.t:$(n)' spec='Uniform' weight="30" tree="@Tree.t:$(n)"/>
+            <operator id='YuleModelSubtreeSlide.t:$(n)' spec='SubtreeSlide' weight="15" gaussian="true" size="1.0" tree="@Tree.t:$(n)"/>
+            <operator id='YuleModelNarrow.t:$(n)' spec='Exchange' isNarrow='true' weight="15" tree="@Tree.t:$(n)"/>
+            <operator id='YuleModelWide.t:$(n)' spec='Exchange' isNarrow='false' weight="3" tree="@Tree.t:$(n)"/>
+            <operator id='YuleModelWilsonBalding.t:$(n)' spec='WilsonBalding' weight="3" tree="@Tree.t:$(n)"/>
+
+            <operator id='YuleBirthRateScaler.t:$(n)' spec='ScaleOperator' scaleFactor="0.75" weight="3" parameter="@birthRate.t:$(n)"/>
+
+            <operator id='StrictClockRateScaler.c:$(n)' spec='ScaleOperator' scaleFactor="0.75" weight="3" parameter='@clockRate.c:$(n)'/>
+            <!-- need updown operator for clockRate?!? Also in SubstModel.xml -->
+            <upDownOperator id='strictClockUpDownOperator.c:$(n)' spec='UpDownOperator' scaleFactor="0.75" weight="3">
+                <up idref="clockRate.c:$(n)"/>
+                <down idref="Tree.t:$(n)"/>
+            </upDownOperator>
+
+]]>
+            <connect srcID='SciPhyTreeLikelihood.$(n)'         targetID='likelihood' inputName='distribution' if="isInitializing"/>
+            <connect srcID='YuleModel.t:$(n)'               targetID='prior' inputName='distribution' if="isInitializing"/>
+            <connect method="beastfx.app.inputeditor.SiteModelInputEditor.customConnector"/>
+
+            <connect srcID='treelog.t:$(n)'                 targetID='mcmc' inputName='logger' if='inposterior(Tree.t:$(n)) and Tree.t:$(n)/estimate=true'/>
+            <!--        <connect srcID='StartingTree.t:$(n)'                targetID='mcmc' inputName='init'   if='inposterior(Tree.t:$(n))'/>-->
+
+            <connect srcID='ClockPrior.c:$(n)'                targetID='prior' inputName='distribution' if='clockRate.c:$(n)/estimate=true'/>
+            <connect srcID='EditProbabilitiesPrior.s:$(n)'    targetID='prior' inputName='distribution' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'/>
+            <!-- when FixMeanMutationRatesOperator, the prior is uniform due to the operator -->
+            <connect srcID='MutationRatePrior.s:$(n)'         targetID='prior' inputName='distribution' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
+
+            <connect srcID='Tree.t:$(n)'                      targetID='state' inputName='stateNode' if='inposterior(Tree.t:$(n))'/>
+            <connect srcID='mutationRate.s:$(n)'              targetID='state' inputName='stateNode' if='inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
+            <connect srcID='editProbabilities.s:$(n)'         targetID='state' inputName='stateNode' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'/>
+            <connect srcID='gammaShape.s:$(n)'                targetID='state' inputName='stateNode' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'/>
+            <connect srcID='clockRate.c:$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'/>
+            <connect srcID='birthRate.t:$(n)'                 targetID='state' inputName='stateNode' if='inposterior(YuleModel.t:$(n)) and inposterior(Tree.t:$(n)) and birthRate.t:$(n)/estimate=true'/>
+            <connect srcID='experimentLength.$(n)'                    targetID='state' inputName='stateNode' if='inlikelihood(experimentLength.$(n)) and experimentLength.$(n)/estimate=true'/>
+
+            <connect srcID='editProbabilitiesScaler.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'>Changes the edit probabilities for partition s:$(n)</connect>
+            <connect srcID='mutationRateScaler.s:$(n)'        targetID='mcmc' inputName='operator' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'>Scales mutation rate of partition s:$(n)</connect>
+            <connect srcID='gammaShapeScaler.s:$(n)'          targetID='mcmc' inputName='operator' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'>Scales gamma shape parameter of partition s:$(n)</connect>
+            <connect srcID='StrictClockRateScaler.c:$(n)'     targetID='mcmc' inputName='operator' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'>Scale clock rate of partition c:$(n)</connect>
+            <connect srcID='YuleBirthRateScaler.t:$(n)'       targetID='mcmc' inputName='operator' if='inposterior(birthRate.t:$(n)) and birthRate.t:$(n)/estimate=true'>Scales birth rate of Yule prior for partition t:$(n)</connect>
+            <connect srcID='strictClockUpDownOperator.c:$(n)' targetID='mcmc' inputName='operator'
+                     if='nooperator(FixMeanRatesOperator) and inlikelihood(clockRate.c:$(n)) and inlikelihood(Tree.t:$(n)) and Tree.t:$(n)/estimate=true and clockRate.c:$(n)/estimate=true'>
+                Scale up substitution rate c:$(n) and scale down tree t:($n)
+            </connect>
+
+            <connect srcID='allTipDatesRandomWalker.t:$(n)'   targetID='mcmc' inputName='operator' if='inposterior(Tree.t:$(n)) and Tree.t:$(n)/estimate=true and allTipDatesRandomWalker.t:$(n)/weight!=0.0'>Estimates tip dates for tree t:$(n)</connect>
+
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelTreeScaler.t:$(n)" targetID="mcmc">Scales all internal nodes for tree t:$(n)</connect>
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelTreeRootScaler.t:$(n)" targetID="mcmc">Scales root node for tree t:$(n)</connect>
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelUniformOperator.t:$(n)" targetID="mcmc">Draws new internal node heights uniformally for tree t:$(n)</connect>
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelSubtreeSlide.t:$(n)" targetID="mcmc">Performs subtree slide rearrangement of tree t:$(n)</connect>
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelNarrow.t:$(n)" targetID="mcmc">Narrow exchange performs local rearrangement of tree t:$(n)</connect>
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelWide.t:$(n)" targetID="mcmc">Wide exchange performs global rearrangement of tree t:$(n)</connect>
+            <connect if="inposterior(YuleModel.t:$(n)) and Tree.t:$(n)/estimate=true" inputName="operator" srcID="YuleModelWilsonBalding.t:$(n)" targetID="mcmc">Performs Wilson-Balding global rearrangement of tree t:$(n)</connect>
+
+            <connect srcID='SciPhyTreeLikelihood.$(n)'         targetID='tracelog' inputName='log' if='inlikelihood(SciPhyTreeLikelihood.$(n))'/>
+            <connect srcID='TreeHeight.t:$(n)'                targetID='tracelog' inputName='log' if='inposterior(Tree.t:$(n))'/>
+            <connect srcID='editProbabilities.s:$(n)'         targetID='tracelog' inputName='log' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'/>
+            <connect srcID='mutationRate.s:$(n)'              targetID='tracelog' inputName='log' if='inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
+            <connect srcID='gammaShape.s:$(n)'                targetID='tracelog' inputName='log' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'/>
+            <connect srcID='clockRate.c:$(n)'                 targetID='tracelog' inputName='log' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'/>
+            <connect srcID='YuleModel.t:$(n)'                 targetID='tracelog' inputName='log' if='inposterior(YuleModel.t:$(n)) and inposterior(Tree.t:$(n)) and Tree.t:$(n)/estimate=true'/>
+            <connect srcID='birthRate.t:$(n)'                 targetID='tracelog' inputName='log' if='inposterior(YuleModel.t:$(n)) and birthRate.t:$(n)/estimate=true'/>
+
+            <connect srcID='GammaShapePrior.s:$(n)'           targetID='prior' inputName='distribution' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'>Prior on gamma shape for partition s:$(n)</connect>
+            <connect srcID='YuleBirthRatePrior.t:$(n)'        targetID='prior' inputName='distribution' if='inposterior(YuleModel.t:$(n)) and inposterior(Tree.t:$(n)) and birthRate.t:$(n)/estimate=true'>Prior on Yule birth rate for partition s:$(n)</connect>
+            <connect srcID="OriginPrior.t:$(n)"               targetID="prior" inputName="distribution" if="inlikelihood(experimentLength.$(n)) and experimentLength.$(n)/estimate=true"/>
+            <mergepoint id='aux-partitiontemplate'/>
+        </partitiontemplate>
+
+        <mergepoint id='clockModelTemplates'/>
+        <mergepoint id='treePriorTemplates'/>
+        <mergepoint id='parametricDistributions'/>
+
+        <!-- Newick tree -->
+        <!--        <subtemplate id='SciphyStartingTree' class='sciphy.evolution.tree.startingTree' mainid='StartingTree.t:$(n)'>-->
+        <!--            <![CDATA[-->
+        <!--        <tree spec='sciphy.evolution.tree.startingTree' id='StartingTree.t:$(n)' estimate='false' taxonset='@TaxonSet.$(n)'-->
+        <!--                taxa="@$(n)" scarringHeight="20" rootHeight="24"-->
+        <!--                scarringDuration="5" sequencesAreClustered="false"/>-->
+        <!--]]>-->
+        <!--        </subtemplate>-->
+
+    </beauticonfig>
+
+
+    <mergepoint id='misc'/>
+
+    <!-- framework for main model -->
+
+    <run spec="MCMC" id="mcmc" chainLength="10000000">
+
+        <state storeEvery='5000' id='state'>
+        </state>
+
+        <distribution spec="CompoundDistribution" id="posterior">
+            <distribution spec="CompoundDistribution" id="prior">
+                <mergepoint id='aux-priors'/>
+            </distribution>
+            <distribution spec="CompoundDistribution" id="likelihood" useThreads="true">
+                <mergepoint id='aux-likelihoods'/>
+            </distribution>
+        </distribution>
+
+        <logger id='tracelog' logEvery="1000" fileName="$(filebase).log" sort="smart">
+            <model idref='posterior'/>
+            <log idref="posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+        </logger>
+
+        <logger id='screenlog' logEvery="1000">
+            <!--model idref='posterior'/-->
+            <log idref="posterior"/>
+            <ESS spec='beast.base.inference.util.ESS' name='log' arg="@posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+        </logger>
+    </run>
+
+</beast>
+
+

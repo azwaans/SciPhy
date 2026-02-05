@@ -1,0 +1,7 @@
+<packages>
+<package name="sciphy" version="0.0.1" url="https://github.com/azwaans/SciPhy/releases/download/Pre-release/sciphy.v0.0.1.zip" projectURL="https://github.com/azwaans/SciPhy" description="SciPhy: Sequential Cas9 Insertion based Phylogenetics">
+<depends on='BEAST.base' atleast='2.7.0'/>
+<depends on='BEAST.app' atleast='2.7.0'/>
+<depends on="feast" atleast="10.0.0"/>
+</package>
+</packages>

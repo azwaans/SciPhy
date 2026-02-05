@@ -1,0 +1,16 @@
+#NEXUS
+ 
+begin taxa;
+dimensions ntax=3;
+taxlabels 0 1 2 ;
+end;
+ 
+begin characters;
+dimensions nchar=5;
+format datatype=integer;
+matrix
+0 8,11,0,0,0
+1 8,1,0,0,0
+2 13,4,5,5,3
+;
+end;
