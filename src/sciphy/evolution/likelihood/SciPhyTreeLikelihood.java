@@ -572,5 +572,60 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         storedStatesIndex = tmp3;
     }
 
+    public int getNodePartialsLength(int nodeNr) {
+        return partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr].length;
+    }
+
+    public void getNodePartials(int nodeNr, double[] partials) {
+        System.arraycopy(partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr], 0, partials, 0, partials.length);
+    }
+
+    public double calculatePartialLikelihoodStatePartial(List<Integer> startState, Node childNode, int categoryId, double[] child1Partials, List<List<Integer>> child1States) {
+
+        final double branchRate = branchRateModel.getRateForBranch(childNode);
+        double statePartialLikelihood = 0;
+        final double jointBranchRate = m_siteModel.getRateForCategory(categoryId, childNode) * branchRate;
+        double distance;
+        double lossDistance;
+
+        //initialise evolutionary distance
+        if (childNode.isRoot()) {
+            distance = (originTime - childNode.getHeight()) * jointBranchRate;
+            lossDistance = (originTime - childNode.getHeight());
+        } else {
+            distance = childNode.getLength() * jointBranchRate;
+            lossDistance = childNode.getLength();
+        }
+
+        // calculate partials
+        if (childNode.isLeaf()) {
+
+            List<Integer> endState = child1States.get(0);
+            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, lossDistance,this.arrayLength);
+
+        } else {
+
+            for (int endStateIndex = 0; endStateIndex < child1States.size(); ++endStateIndex) {
+
+                List<Integer> endState = child1States.get(endStateIndex);
+
+                // if the end state has non-null partial likelihood
+                if (child1Partials[endStateIndex] != 0.0) {
+
+                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, lossDistance,this.arrayLength) *
+                            child1Partials[endStateIndex];
+
+                }
+            }
+        }
+
+
+        return statePartialLikelihood;
+    }
+
+    public List<List<Integer>> getNodeStates(int nodeNr) {
+        return ancestralStates.get(makeCachingIndexStates(nodeNr));
+    }
+
 
 }
