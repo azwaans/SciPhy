@@ -4,6 +4,7 @@ package sciphy.evolution.likelihood;
 import java.util.*;
 
 import beast.base.core.Description;
+import beast.base.core.Log;
 import beast.base.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
@@ -178,9 +179,12 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     @Override
     public double calculateLogP() {
         final TreeInterface tree = treeInput.get();
+        this.hasDirt = Tree.IS_FILTHY;
 
         if(originTime != 0.0) {
             if (tree.getRoot().getHeight() >= originTime) {
+                //adding this artificially
+                traverse(tree.getRoot(), 0);
                 return Double.NEGATIVE_INFINITY;
             }
         }
@@ -251,10 +255,10 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
      */
     protected void initLeafPartials(int nodeNr) {
 
-            double[] leafPartialLikelihoods = initPartialLikelihoodsLeaf(ancestralStates.get(makeCachingIndexStates(nodeNr)).size());
-            this.partialLikelihoods[0][nodeNr] = new double[leafPartialLikelihoods.length];
-            this.partialLikelihoods[1][nodeNr] = new double[leafPartialLikelihoods.length];
-            System.arraycopy(leafPartialLikelihoods, 0, this.partialLikelihoods[0][nodeNr], 0, leafPartialLikelihoods.length);
+        double[] leafPartialLikelihoods = initPartialLikelihoodsLeaf(ancestralStates.get(makeCachingIndexStates(nodeNr)).size());
+        this.partialLikelihoods[0][nodeNr] = new double[leafPartialLikelihoods.length];
+        this.partialLikelihoods[1][nodeNr] = new double[leafPartialLikelihoods.length];
+        System.arraycopy(leafPartialLikelihoods, 0, this.partialLikelihoods[0][nodeNr], 0, leafPartialLikelihoods.length);
 
     }
 
@@ -576,6 +580,20 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         return partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr].length;
     }
 
+    public double[] getSafePartials(int nodeNr) {
+        int currentIndex = currentPartialsIndex[nodeNr];
+        double[] buffer = partialLikelihoods[currentIndex][nodeNr];
+
+        // If current is null or empty, use the stored one
+        if (buffer == null || buffer.length == 0) {
+            int storedIndex = 1 - currentIndex;
+            buffer = partialLikelihoods[storedIndex][nodeNr];
+        }
+
+        // Final fallback: if both are empty, return a tiny dummy array or null
+        return (buffer != null && buffer.length > 0) ? buffer : null;
+    }
+
     public void getNodePartials(int nodeNr, double[] partials) {
         System.arraycopy(partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr], 0, partials, 0, partials.length);
     }
@@ -627,5 +645,41 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         return ancestralStates.get(makeCachingIndexStates(nodeNr));
     }
 
+
+
+    public void checkStateSizesViolations(String errorMessage) {
+        final TreeInterface tree = treeInput.get();
+        Node root = tree.getRoot();
+        traverseStates(root,errorMessage);
+    }
+
+    public void traverseStates(Node node, String errorMessage) {
+
+        int nodeIndex = node.getNr();
+
+        if(!node.isRoot()) {
+
+            int nodeParentIndex = node.getParent().getNr();
+            int childSize = ancestralStates.get(makeCachingIndexStates(nodeIndex)).size();
+            int parentSize = ancestralStates.get(makeCachingIndexStates(nodeParentIndex)).size();
+            if(parentSize > childSize) {
+                Log.info.println(errorMessage);
+            }
+
+        }
+
+        if (!node.isLeaf()) {
+
+            final Node child1 = node.getLeft();
+            traverseStates(child1,errorMessage);
+            final Node child2 = node.getRight();
+            traverseStates(child2,errorMessage);
+
+        }
+
+
+
+
+    }
 
 }
