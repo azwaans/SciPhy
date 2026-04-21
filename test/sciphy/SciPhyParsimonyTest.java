@@ -12,7 +12,6 @@ import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
 import sciphy.evolution.likelihood.SciPhyParsimony;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class SciPhyParsimonyTest {
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
         //test ancestral states sets calculations
-        parsimony.calculateLogP();
+        parsimony.calculateParsimony();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
 
         //first calculate states dictionary
@@ -83,14 +82,14 @@ public class SciPhyParsimonyTest {
 
         //parsimony
         double parsimonyExpected = 0;
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
 
     }
 
-  
+
 
     @Test
     public void testAncestralSetsEditedSequencesEditedAncestorParsimony() {
@@ -133,7 +132,7 @@ public class SciPhyParsimonyTest {
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength, "origin", orig);
 
         //test ancestral states sets calculations
-        parsimony.calculateLogP();
+        parsimony.calculateParsimony();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
 
 
@@ -156,7 +155,7 @@ public class SciPhyParsimonyTest {
 
         //parsimony
         double parsimonyExpected = 3;
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
@@ -164,7 +163,7 @@ public class SciPhyParsimonyTest {
 
     }
 
-   
+
 
     @Test
     public void testAncestralSetsEditedSequencesUneditedAncestorsParsimony() {
@@ -207,7 +206,7 @@ public class SciPhyParsimonyTest {
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
         //test ancestral states sets calculations
-        parsimony.calculateLogP();
+        parsimony.calculateParsimony();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
 
 
@@ -239,7 +238,7 @@ public class SciPhyParsimonyTest {
 
         //parsimony
         double parsimonyExpected = 4;
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
@@ -288,7 +287,7 @@ public class SciPhyParsimonyTest {
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
         //test ancestral states sets calculations
-        parsimony.calculateLogP();
+        parsimony.calculateParsimony();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
 
 
@@ -321,13 +320,13 @@ public class SciPhyParsimonyTest {
         assertTrue(statesDictionary.get(parsimony.makeCachingIndexStates(2)).contains(allele0));
         //parsimony
         double parsimonyExpected = 5;
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
     }
 
-   
+
     @Test
     public void testAncestralSetsEditedSequencesUneditedAncestorsPositionsParsimony() {
         // Testing the ancestral state reconstruction at internal nodes
@@ -369,7 +368,7 @@ public class SciPhyParsimonyTest {
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
         //test ancestral states sets calculations
-        parsimony.calculateLogP();
+        parsimony.calculateParsimony();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
 
 
@@ -400,14 +399,14 @@ public class SciPhyParsimonyTest {
 
         //parsimony
         double parsimonyExpected = 3;
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
     }
 
 
-  
+
     @Test
     public void testAncestralSets3LeavesParsimony() {
 
@@ -453,7 +452,7 @@ public class SciPhyParsimonyTest {
 
 
         //calculate states dictionary
-        parsimony.calculateLogP();
+        parsimony.calculateParsimony();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
         assertEquals(5, statesDictionary.size());
 
@@ -494,7 +493,7 @@ public class SciPhyParsimonyTest {
 
         //parsimony
         double parsimonyExpected = 5;
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
@@ -548,35 +547,22 @@ public class SciPhyParsimonyTest {
 
 
         //initialise partialLikelihoods
-        parsimony.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+        parsimony.partialParsimonies = new double[2][tree1.getNodeCount()][];
 
         //Manually calc the parsimony for that tree:
-
-        //internal node partials:
-        List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, 0);
-        List<Integer> allele12 = Arrays.asList(1, 2, 0, 0, 0);
-        List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
-        double clockRate = 0.5;
-
-        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate, 5);
-        double partial1000Internal = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5);
-        double partial1200Internal = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate, 5);
-
-        //root node
-        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5) + partial1200Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5);
 
         //logparsimony
         double parsimonyExpected = 2;
 
 
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
 
     }
 
-  
+
 
     @Test
     public void testCherry2Shared1DifferentInsertParsimony() {
@@ -626,38 +612,24 @@ public class SciPhyParsimonyTest {
 
 
         //initialise partialLikelihoods
-        parsimony.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+        parsimony.partialParsimonies = new double[2][tree1.getNodeCount()][];
 
         //Manually calc the parsimony for that tree:
-
-        //internal node partials:
-        List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, 0);
-        List<Integer> allele12 = Arrays.asList(1, 2, 0, 0, 0);
-        List<Integer> allele122 = Arrays.asList(1, 2, 2, 0, 0);
-        List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
-        double clockRate = 0.5;
-
-        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 5 * clockRate,5) * substitutionModel.getSequenceTransitionProbability(allele0, allele122, 5 * clockRate, 5);
-        double partial1000Internal = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 5 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele122, 5 * clockRate, 5);
-        double partial1200Internal = substitutionModel.getSequenceTransitionProbability(allele12, allele12, 5 * clockRate,5) * substitutionModel.getSequenceTransitionProbability(allele12, allele122, 5 * clockRate, 5);
-
-        //root node
-        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5) + partial1200Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5);
 
         //logparsimony
         double parsimonyExpected = 3;
 
 
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
-        Log.info.println(Arrays.deepToString(parsimony.partialLikelihoods));
+        Log.info.println(Arrays.deepToString(parsimony.partialParsimonies));
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
 
     }
 
-   
+
 
     @Test
     public void testCherryNoInsertParsimony() {
@@ -703,31 +675,20 @@ public class SciPhyParsimonyTest {
 
 
         //initialise partialLikelihoods
-        parsimony.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+        parsimony.partialParsimonies = new double[2][tree1.getNodeCount()][];
 
         //Manually calc the parsimony for that tree:
-
-        //internal node partials:
-        List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, 0);
-        double clockRate = 0.5;
-
-        double partial0000Internal = substitutionModel.getSequenceTransitionProbability(allele0, allele0, 5 * clockRate,5) * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 5 * clockRate,5);
-
-        //root node
-        double partialOrigin = partial0000Internal * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate,5);
-
-        //logparsimony
         double parsimonyExpected = 0;
 
 
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         assertEquals(parsimonyCalc, parsimonyExpected);
 
 
     }
 
-    
+
     @Test
     public void test3LeavesSameLengthInsertsParsimony() {
 
@@ -772,7 +733,7 @@ public class SciPhyParsimonyTest {
 
 
         //initialise partialLikelihoods
-        parsimony.partialLikelihoods = new double[2][tree1.getNodeCount()][];
+        parsimony.partialParsimonies = new double[2][tree1.getNodeCount()][];
 
         //Manually calc the parsimony for that tree:
 
@@ -784,7 +745,7 @@ public class SciPhyParsimonyTest {
         List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
 
         //logparsimony
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
 
         Hashtable<Integer, List<List<Integer>>> statesDictionary = parsimony.ancestralStates;
 
@@ -877,33 +838,10 @@ public class SciPhyParsimonyTest {
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
-
-        //initialise partialLikelihoods
-        //parsimony.partialLikelihoods = new double[2][tree1.getNodeCount()][];
-
-        //Manually calc the parsimony for that tree:
-
-        //internal node partials:
-        List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, 0);
-        List<Integer> allele12 = Arrays.asList(1, 2, 0, 0, 0);
-        List<Integer> allele11 = Arrays.asList(1, 1, 0, 0, 0);
-        List<Integer> allele21 = Arrays.asList(2, 1, 0, 0, 0);
-        List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
-        double clockRate = 0.5;
-
-        double partial0000Internal1 = substitutionModel.getSequenceTransitionProbability(allele0, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele0, allele11, 1 * clockRate, 5);
-        double partial1000Internal1 = substitutionModel.getSequenceTransitionProbability(allele1, allele12, 1 * clockRate, 5) * substitutionModel.getSequenceTransitionProbability(allele1, allele11, 1 * clockRate, 5);
-
-        double partial0000Internal2 = (partial0000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 1 * clockRate, 5) + partial1000Internal1 * substitutionModel.getSequenceTransitionProbability(allele0, allele1, 1 * clockRate, 5)) * (substitutionModel.getSequenceTransitionProbability(allele0, allele21, 2 * clockRate, 5));
-
-
-        //root node
-        double partialOrigin = partial0000Internal2 * substitutionModel.getSequenceTransitionProbability(allele0, allele0, 2 * clockRate, 5);
-
         //logparsimony
         double parsimonyExpected = 5;
 
-        double parsimonyCalc = parsimony.calculateLogP();
+        double parsimonyCalc = parsimony.calculateParsimony();
         assertEquals(parsimonyExpected, parsimonyCalc);
 
     }
