@@ -11,7 +11,10 @@ import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.substitutionmodel.EigenDecomposition;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Node;
+import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.PoissonDistributionImpl;
+import org.apache.commons.math.distribution.PoissonDistribution;
+import org.apache.commons.math.special.Gamma;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,8 +99,8 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      */
     public double getSequenceTransitionProbability(final List<Integer> startSequence, final List<Integer> endSequence, double distance, double lossDistance, int arrayLength) {
 
-        List<Integer> startState = new ArrayList(startSequence);
-        List<Integer> endState = new ArrayList(endSequence);
+        List<Integer> startState = new ArrayList<>(startSequence);
+        List<Integer> endState = new ArrayList<>(endSequence);
 
 
       if(startState.equals(lostState)) {
@@ -157,7 +160,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
                 int nrOfPossibleInserts = arrayLength - startState.size();
 
                 //initialise the poisson distribution with mean rate * distance
-                org.apache.commons.math.distribution.PoissonDistribution poissonDistribution = new PoissonDistributionImpl(distance);
+                PoissonDistribution poissonDistribution = new PoissonDistributionImpl(distance);
 
                 //calculate the transition probability for the case where all available positions are edited in
                 // This is the absorbing state in the poisson process
@@ -195,8 +198,8 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      */
     public double getSequenceTransitionProbabilityTipEdge(final List<Integer> startSequence, final List<Integer> endSequence, double distance, double lossDistance,int arrayLength) {
 
-        List<Integer> startState = new ArrayList(startSequence);
-        List<Integer> endState = new ArrayList(endSequence);
+        List<Integer> startState = new ArrayList<>(startSequence);
+        List<Integer> endState = new ArrayList<>(endSequence);
 
 
         if(startState.equals(lostState)) {
@@ -270,8 +273,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
             int nrOfPossibleInserts = arrayLength - startState.size();
 
             //initialise the poisson distribution with mean rate * distance
-            org.apache.commons.math.distribution.PoissonDistribution poissonDistribution = new PoissonDistributionImpl(distance);
-
+            PoissonDistribution poissonDistribution = new PoissonDistributionImpl(distance);
             //calculate the transition probability for the case where all available positions are edited in
             // This is the absorbing state in the poisson process
             // P(max) = 1- sum(P(n)) * probability of this insert combination
@@ -308,7 +310,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      * @param nbrOfPossibleInserts  is the number of available positions until the absorbing state is reached
      * @param dist is the poisson
      */
-    public double calculateAbsorbingStateProbability(org.apache.commons.math.distribution.PoissonDistribution dist,int nbrOfPossibleInserts) {
+    public double calculateAbsorbingStateProbability(PoissonDistribution dist,int nbrOfPossibleInserts) {
 
         // The start state is already fully edited, so the absorbing state is reached with certainty.
         // Handled separately because the regularized gamma is undefined (NaN) at a = 0.
