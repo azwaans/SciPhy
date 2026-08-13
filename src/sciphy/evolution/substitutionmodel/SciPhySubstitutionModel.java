@@ -310,14 +310,21 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      */
     public double calculateAbsorbingStateProbability(org.apache.commons.math.distribution.PoissonDistribution dist,int nbrOfPossibleInserts) {
 
-        double absorbingStateProbability = 1.0;
-
-        for(int i = 0;  i < nbrOfPossibleInserts ; i++) {
-            absorbingStateProbability -= dist.probability(i);
+        // The start state is already fully edited, so the absorbing state is reached with certainty.
+        // Handled separately because the regularized gamma is undefined (NaN) at a = 0.
+        if (nbrOfPossibleInserts == 0) {
+            return 1.0;
         }
 
-        return absorbingStateProbability;
-
+        // Calculate P(X >= nbrOfPossibleInserts) for X ~ Poisson(mean), as the lower regularized incomplete gamma.
+        // To avoid issues with floating point precision we avoid calculating this iteratively.
+        try {
+            return Gamma.regularizedGammaP(nbrOfPossibleInserts, dist.getMean());
+            // return 1 - dist.cumulativeProbability(nbrOfPossibleInserts - 1);
+        } catch (MathException e) {
+            throw new RuntimeException("Failed to evaluate the absorbing state probability for mean="
+                    + dist.getMean() + " and " + nbrOfPossibleInserts + " possible inserts.", e);
+        }
     }
 
 
