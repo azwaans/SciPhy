@@ -1,6 +1,5 @@
 package sciphy.evolution.likelihood;
 
-
 import java.util.*;
 
 import beast.base.core.Description;
@@ -25,9 +24,6 @@ import static sciphy.util.LogSum.logSum;
         "a beast tree and a branch rate model. This is a version of the SciPhy likelihood using caching without a likelihoodCore implementation ")
 
 public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
-
-
-
 
     final public Input<RealParameter> originTimeInput = new Input<>("origin", "Duration of the experiment");
 
@@ -57,7 +53,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
     /**
      * Lengths of the branches in the tree associated with each of the nodes
-     * in the tree through their node  numbers. By comparing whether the
+     * in the tree through their node numbers. By comparing whether the
      * current branch length differs from stored branch lengths, it is tested
      * whether a node is dirty and needs to be recomputed (there may be other
      * reasons as well...).
@@ -74,7 +70,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     protected double[][] scalingFactors;
     protected boolean useScaling = false;
 
-
     private double scalingThreshold = 1.0E-100;
 
     protected int[] currentPartialsIndex;
@@ -82,7 +77,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
     protected int[] currentStatesIndex;
     protected int[] storedStatesIndex;
-
 
     @Override
     public void initAndValidate() {
@@ -144,9 +138,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
             scalingFactors = new double[2][nodeCount];
         }
 
-
         hasDirt = Tree.IS_FILTHY;
-
 
         for (int i = 0; i < treeInput.get().getLeafNodeCount(); i++) {
             initLeafAncestors(i);
@@ -155,7 +147,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         for (int i = 0; i < treeInput.get().getLeafNodeCount(); i++) {
             initLeafPartials(i);
         }
-
     }
 
     public SubstitutionModel getSubstitutionModel() {
@@ -181,7 +172,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         final TreeInterface tree = treeInput.get();
         this.hasDirt = Tree.IS_FILTHY;
 
-        if(originTime != 0.0) {
+        if (originTime != 0.0) {
             if (tree.getRoot().getHeight() >= originTime) {
                 //adding this artificially
                 traverse(tree.getRoot(), 0);
@@ -200,7 +191,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
             } else {
                 //the tree log likelihood is the log(p) of unedited state at the origin
                 categoryLogLikelihoods[i] = Math.log(calculateOriginPartial(tree.getRoot(), i)) + getLogScalingFactor();
-
             }
         }
         logP = logSum(categoryLogLikelihoods, categoryLogLikelihoods.length) - Math.log(m_siteModel.getCategoryCount());
@@ -210,84 +200,58 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     /**
      * Scale the partials at a given node. This uses a scaling suggested by Ziheng Yang in
      * Yang (2000) J. Mol. Evol. 51: 423-432
-     * <p/>
-     * This function looks over the partial likelihoods for each state at each pattern
-     * and finds the largest. If this is less than the scalingThreshold (currently set
-     * to 1E-40) then it rescales the partials for that pattern by dividing by this number
-     * (i.e., normalizing to between 0, 1). It then stores the log of this scaling.
-     * This is called for every internal node after the partials are calculated so provides
-     * most of the performance hit. Ziheng suggests only doing this on a proportion of nodes
-     * but this sounded like a headache to organize (and he doesn't use the threshold idea
-     * which improves the performance quite a bit).
      *
      * @param nodeNumber
      */
     protected void scalePartials(int nodeNumber) {
-
         double scaleFactor = 0.0;
 
         //find the highest partial likelihood
-        //is node number same as nodeIndex
         for (int k = 0; k < partialLikelihoods[currentPartialsIndex[nodeNumber]][nodeNumber].length; k++) {
-
             if (partialLikelihoods[currentPartialsIndex[nodeNumber]][nodeNumber][k] > scaleFactor) {
                 scaleFactor = partialLikelihoods[currentPartialsIndex[nodeNumber]][nodeNumber][k];
             }
-
         }
         //if this partial is smaller than the threshold, scale the partials
         if (scaleFactor < scalingThreshold) {
-
             for (int k = 0; k < partialLikelihoods[currentPartialsIndex[nodeNumber]][nodeNumber].length; k++) {
                 partialLikelihoods[currentPartialsIndex[nodeNumber]][nodeNumber][k] /= scaleFactor;
             }
             // save the log(scaling factors)
             scalingFactors[currentPartialsIndex[nodeNumber]][nodeNumber] = Math.log(scaleFactor);
-
         } else {
             scalingFactors[currentPartialsIndex[nodeNumber]][nodeNumber] = 0.0;
         }
-
     }
 
     /**
      * Calculate partial likelihoods for a given leaf node, and fill the corresponding partialLikelihood array
      */
     protected void initLeafPartials(int nodeNr) {
-
         double[] leafPartialLikelihoods = initPartialLikelihoodsLeaf(ancestralStates.get(makeCachingIndexStates(nodeNr)).size());
         this.partialLikelihoods[0][nodeNr] = new double[leafPartialLikelihoods.length];
         this.partialLikelihoods[1][nodeNr] = new double[leafPartialLikelihoods.length];
         System.arraycopy(leafPartialLikelihoods, 0, this.partialLikelihoods[0][nodeNr], 0, leafPartialLikelihoods.length);
-
     }
-
 
     public int makeCachingIndexStates(int nodeIndex) {
         int node = nodeIndex + 1;
-        String forHashing = node + "" +  currentStatesIndex[nodeIndex] + ""+ node;
+        String forHashing = node + "" + currentStatesIndex[nodeIndex] + "" + node;
         return forHashing.hashCode();
-
     }
-
 
     /**
      * Calculate the set of ancestral states for a given leaf node, and fill the corresponding AncestralStates hashmap
      */
     protected void initLeafAncestors(int nodeNr) {
-
         List<List<Integer>> possibleLeafAncestors = getPossibleAncestors(dataInput.get().getCounts().get(nodeNr));
-
         ancestralStates.put(makeCachingIndexStates(nodeNr), possibleLeafAncestors);
-
     }
-
 
     /**
      * This implements a postorder traversal of the tree to fill the ancestralStates hashmap and corresponding partialLikelihood array.
      */
     protected int traverse(Node node, int categoryId) {
-
         int update = (node.isDirty() | hasDirt);
         int nodeIndex = node.getNr();
 
@@ -300,7 +264,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         }
 
         if (!node.isLeaf()) {
-
             final Node child1 = node.getLeft();
             final int update1 = traverse(child1, categoryId);
             final Node child2 = node.getRight();
@@ -308,7 +271,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
             // If either child node was updated then update this node too
             if (update1 != Tree.IS_CLEAN || update2 != Tree.IS_CLEAN) {
-
                 update |= (update1 | update2);
 
                 if (update >= Tree.IS_FILTHY) {
@@ -322,7 +284,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
                 if (useScaling) {
                     scalePartials(nodeIndex);
                 }
-
             }
         }
 
@@ -334,30 +295,23 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
      * AncestralStates hashmap with the resulting set.
      */
     public void calculateStates(int nodeNr, int child1Nr, int child2Nr) {
-
         List<List<Integer>> ancSetChild1 = ancestralStates.get(makeCachingIndexStates(child1Nr));
         List<List<Integer>> ancSetChild2 = ancestralStates.get(makeCachingIndexStates(child2Nr));
-
 
         if (ancSetChild1.contains(lostState) || ancSetChild1.contains(missingState)) {
             //the intersection is the child2 set
             List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild2);
             ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
-        }
-        else if (ancSetChild2.contains(lostState) ||  ancSetChild2.contains(missingState)) {
+        } else if (ancSetChild2.contains(lostState) || ancSetChild2.contains(missingState)) {
             //the intersection is the child1 set
             List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild1);
             ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
-        }
-        else {
+        } else {
             //intersection needs to be computed
             List<List<Integer>> ancSetNode = new ArrayList<>(ancSetChild1);
             ancSetNode.retainAll(ancSetChild2);
             ancestralStates.put(makeCachingIndexStates(nodeNr), ancSetNode);
-
         }
-
-
     }
 
     public void setNodePartialsForUpdate(int nodeIndex) {
@@ -368,18 +322,15 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         currentStatesIndex[nodeIndex] = 1 - currentStatesIndex[nodeIndex];
     }
 
-
     /**
      * This function calculates partial likelihoods for all possible states at a node given its children partials
      * and sets the corresponding partial likelihoods, for all possible states at node nodeNr
      */
     public void calculatePartials(int nodeNr, Node child1, Node child2, int categoryId) {
-
         //initialize an array for the partials
         double[] partials = new double[ancestralStates.get(makeCachingIndexStates(nodeNr)).size()];
 
         for (int stateIndex = 0; stateIndex < ancestralStates.get(makeCachingIndexStates(nodeNr)).size(); ++stateIndex) {
-
             List<Integer> startState = ancestralStates.get(makeCachingIndexStates(nodeNr)).get(stateIndex);
 
             double child1PartialLikelihoodState = calculatePartialLikelihoodState(startState, child1, categoryId);
@@ -389,22 +340,17 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         }
 
         partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr] = partials;
-
     }
 
     /**
-     * This function calculates the likelihood of the unedited state at the origin given partial likelihoods at the root
-     * node
+     * This function calculates the likelihood of the unedited state at the origin given partial likelihoods at the root node
      *
      * @return likelihood of the unedited barcode at t = origin
      */
-
     public double calculateOriginPartial(Node rootNode, int categoryId) {
-
         //the start state is the unedited sciphy barcode
         double partialAtOrigin = calculatePartialLikelihoodState(uneditedState, rootNode, categoryId);
         return partialAtOrigin;
-
     }
 
     /**
@@ -414,7 +360,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
      * @return partial likelihood for a state at a node given partials at a node childNode
      */
     public double calculatePartialLikelihoodState(List<Integer> startState, Node childNode, int categoryId) {
-
         final double branchRate = branchRateModel.getRateForBranch(childNode);
         double statePartialLikelihood = 0;
         final double jointBranchRate = m_siteModel.getRateForCategory(categoryId, childNode) * branchRate;
@@ -432,26 +377,19 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
         // calculate partials
         if (childNode.isLeaf()) {
-
             List<Integer> endState = ancestralStates.get(makeCachingIndexStates(childNode.getNr())).get(0);
-            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, lossDistance,this.arrayLength);
-
+            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, lossDistance, this.arrayLength);
         } else {
-
             for (int endStateIndex = 0; endStateIndex < ancestralStates.get(makeCachingIndexStates(childNode.getNr())).size(); ++endStateIndex) {
-
                 List<Integer> endState = ancestralStates.get(makeCachingIndexStates(childNode.getNr())).get(endStateIndex);
 
                 // if the end state has non-null partial likelihood
                 if (partialLikelihoods[currentPartialsIndex[childNode.getNr()]][childNode.getNr()][endStateIndex] != 0.0) {
-
-                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, lossDistance,this.arrayLength) *
+                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, lossDistance, this.arrayLength) *
                             partialLikelihoods[currentPartialsIndex[childNode.getNr()]][childNode.getNr()][endStateIndex];
-
                 }
             }
         }
-
 
         return statePartialLikelihood;
     }
@@ -463,7 +401,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
      * @return array of partial likelihoods at leaf node
      */
     public double[] initPartialLikelihoodsLeaf(int size) {
-
         double[] leafPartials = new double[size];
         leafPartials[0] = 1;
         return leafPartials;
@@ -472,28 +409,21 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     /**
      * This function returns all possible ancestral states given a sequence.
      * Because sciphy sequences record ordered edits, ancestral states are obtained by sequentially removing edits
-     * along the sequence (from any insert (1 to N)  to 0)
+     * along the sequence (from any insert (1 to N) to 0)
      *
      * @return a list of possible ancestral sciphy barcode states
      */
     public List<List<Integer>> getPossibleAncestors(List<Integer> sequence) {
-
-        List<List<Integer>> ancestors = new ArrayList();
-
+        List<List<Integer>> ancestors = new ArrayList<>();
 
         //possible ancestors of a missing state can be either the Wild-card state (aka, any non-lost state), or the barcode could have already been lost previously
-        if(sequence.equals(missingState)) {
-
+        if (sequence.equals(missingState)) {
             ancestors.add(new ArrayList<>(missingState));
-            if ( substitutionModel.getMissingRate() != 0.0) {
+            if (substitutionModel.getMissingRate() != 0.0) {
                 ancestors.add(new ArrayList<>(lostState));
             }
-
             return ancestors;
-        }
-
-
-        else {
+        } else {
             ancestors.add(new ArrayList<>(sequence));
             List<Integer> ancestor = new ArrayList<>(sequence);
             for (int i = sequence.size() - 1; i >= 0; --i) {
@@ -507,14 +437,12 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     }
 
     /**
-     * This function returns the scaling factor for that pattern by summing over
-     * the log scalings used at each node. If scaling is off then this just returns
-     * a 0.
+     * Returns the scaling factor for that pattern by summing over the log scalings used at each node.
+     * If scaling is off then this just returns 0.
      *
      * @return the log scaling factor
      */
     public double getLogScalingFactor() {
-
         double logScalingFactor = 0.0;
         if (useScaling) {
             for (int i = 0; i < nodeCount; i++) {
@@ -524,11 +452,137 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         return logScalingFactor;
     }
 
+    /**
+     * Returns the most likely barcode (state) for a given node.
+     * Includes null checks for safe early-stage evaluation.
+     */
+    public int[] getRepresentativeBarcode(int nodeNr) {
+        if (partialLikelihoods == null ||
+                partialLikelihoods[currentPartialsIndex[nodeNr]] == null ||
+                partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr] == null) {
+            return new int[arrayLength];
+        }
+
+        double[] partials = partialLikelihoods[currentPartialsIndex[nodeNr]][nodeNr];
+        List<List<Integer>> states = ancestralStates.get(makeCachingIndexStates(nodeNr));
+
+        if (states == null || states.isEmpty()) {
+            return new int[arrayLength];
+        }
+
+        int bestIdx = 0;
+        double maxLikelihood = -1.0;
+
+        for (int i = 0; i < partials.length; i++) {
+            if (partials[i] > maxLikelihood) {
+                maxLikelihood = partials[i];
+                bestIdx = i;
+            }
+        }
+
+        List<Integer> bestState = states.get(bestIdx);
+        int[] result = new int[bestState.size()];
+        for (int i = 0; i < bestState.size(); i++) {
+            result[i] = bestState.get(i);
+        }
+        return result;
+    }
 
     /**
-     * check state for changed variables and update temp results if necessary *
+     * Calculates transition probability from a parent node to a leaf node across all parent states.
+     * Uses double-buffering safe methods to retrieve partials.
      */
-    //requires recalculation if the data has changed, if the sitemodel (or sub model has changed), the branch rate model, or the tree has changed.
+    public double getTransitionProbabilityToLeaf(int leafNodeNr) {
+        Node leaf = treeInput.get().getNode(leafNodeNr);
+        Node parent = leaf.getParent();
+        if (parent == null) return 1.0;
+
+        int parentNr = parent.getNr();
+        int categoryId = 0; // Default site category for tree weight calculation
+
+        double[] parentPartials = getSafePartials(parentNr);
+        List<List<Integer>> parentStates = ancestralStates.get(makeCachingIndexStates(parentNr));
+
+        if (parentPartials == null || parentStates == null) return 0.0;
+
+        List<Integer> leafSequence = ancestralStates.get(makeCachingIndexStates(leafNodeNr)).get(0);
+
+        final double branchRate = branchRateModel.getRateForBranch(leaf);
+        final double jointBranchRate = m_siteModel.getRateForCategory(categoryId, leaf) * branchRate;
+        double distance = leaf.getLength() * jointBranchRate;
+        double lossDistance = leaf.getLength();
+
+        double totalProb = 0;
+        double parentSum = 0;
+
+        for (int i = 0; i < parentPartials.length; i++) {
+            if (parentPartials[i] > 0) {
+                List<Integer> pState = parentStates.get(i);
+
+                double prob = substitutionModel.getSequenceTransitionProbabilityTipEdge(
+                        pState, leafSequence, distance, lossDistance, this.arrayLength
+                );
+
+                totalProb += prob * parentPartials[i];
+                parentSum += parentPartials[i];
+            }
+        }
+
+        return (parentSum > 0) ? (totalProb / parentSum) : 0.0;
+    }
+
+    /**
+     * Probabilistic weight calculation marginalizing over all possible ancestral states.
+     * Refactored to accept min/max weights from the calling EdgeWeights class.
+     */
+    public double calculateExpectedAcquisitionWeight(int parentNr, int childNr, double minWeight, double maxWeight) {
+        synchronized (this) {
+            List<List<Integer>> parentStates = getNodeStates(parentNr);
+            List<List<Integer>> childStates = getNodeStates(childNr);
+
+            double[] parentPartials = getSafePartials(parentNr);
+            double[] childPartials = getSafePartials(childNr);
+
+            if (parentPartials == null || childPartials == null || parentStates == null || childStates == null) {
+                return minWeight;
+            }
+
+            double parentSum = 0;
+            for (double d : parentPartials) parentSum += d;
+
+            double childSum = 0;
+            for (double d : childPartials) childSum += d;
+
+            if (parentSum == 0 || childSum == 0) return minWeight;
+
+            double expectedDist = 0.0;
+
+            for (int pIdx = 0; pIdx < parentStates.size(); pIdx++) {
+                double pProb = parentPartials[pIdx] / parentSum;
+                List<Integer> pBar = parentStates.get(pIdx);
+
+                for (int cIdx = 0; cIdx < childStates.size(); cIdx++) {
+                    double cProb = childPartials[cIdx] / childSum;
+                    List<Integer> cBar = childStates.get(cIdx);
+
+                    double pairDist = 0.0;
+                    for (int i = 0; i < pBar.size(); i++) {
+                        // Parent unedited (0) -> Child edited (!= 0)
+                        if (pBar.get(i) == 0 && cBar.get(i) != 0) {
+                            pairDist += 1.0;
+                        }
+                    }
+                    expectedDist += (pProb * cProb * pairDist);
+                }
+            }
+
+            return Math.max(minWeight, Math.min(maxWeight, expectedDist));
+        }
+    }
+
+    /**
+     * check state for changed variables and update temp results if necessary
+     */
     @Override
     protected boolean requiresRecalculation() {
         hasDirt = Tree.IS_CLEAN;
@@ -542,7 +596,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
             return true;
         }
         if (branchRateModel != null && branchRateModel.isDirtyCalculation()) {
-            //m_nHasDirt = Tree.IS_DIRTY;
             return true;
         }
         return treeInput.get().somethingIsDirty();
@@ -550,18 +603,14 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
     @Override
     public void store() {
-
         super.store();
         System.arraycopy(m_branchLengths, 0, storedBranchLengths, 0, m_branchLengths.length);
         System.arraycopy(currentPartialsIndex, 0, storedPartialsIndex, 0, nodeCount);
         System.arraycopy(currentStatesIndex, 0, storedStatesIndex, 0, nodeCount);
     }
 
-    //TODO do we need unstore??? We think we don't because when scaling is active, it is for the entire likelihood
-
     @Override
     public void restore() {
-
         super.restore();
         double[] tmp = m_branchLengths;
         m_branchLengths = storedBranchLengths;
@@ -590,7 +639,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
             buffer = partialLikelihoods[storedIndex][nodeNr];
         }
 
-        // Final fallback: if both are empty, return a tiny dummy array or null
         return (buffer != null && buffer.length > 0) ? buffer : null;
     }
 
@@ -599,7 +647,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     }
 
     public double calculatePartialLikelihoodStatePartial(List<Integer> startState, Node childNode, int categoryId, double[] child1Partials, List<List<Integer>> child1States) {
-
         final double branchRate = branchRateModel.getRateForBranch(childNode);
         double statePartialLikelihood = 0;
         final double jointBranchRate = m_siteModel.getRateForCategory(categoryId, childNode) * branchRate;
@@ -617,26 +664,19 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
         // calculate partials
         if (childNode.isLeaf()) {
-
             List<Integer> endState = child1States.get(0);
-            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, lossDistance,this.arrayLength);
-
+            statePartialLikelihood += substitutionModel.getSequenceTransitionProbabilityTipEdge(startState, endState, distance, lossDistance, this.arrayLength);
         } else {
-
             for (int endStateIndex = 0; endStateIndex < child1States.size(); ++endStateIndex) {
-
                 List<Integer> endState = child1States.get(endStateIndex);
 
                 // if the end state has non-null partial likelihood
                 if (child1Partials[endStateIndex] != 0.0) {
-
-                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, lossDistance,this.arrayLength) *
+                    statePartialLikelihood = statePartialLikelihood + substitutionModel.getSequenceTransitionProbability(startState, endState, distance, lossDistance, this.arrayLength) *
                             child1Partials[endStateIndex];
-
                 }
             }
         }
-
 
         return statePartialLikelihood;
     }
@@ -645,41 +685,29 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         return ancestralStates.get(makeCachingIndexStates(nodeNr));
     }
 
-
-
     public void checkStateSizesViolations(String errorMessage) {
         final TreeInterface tree = treeInput.get();
         Node root = tree.getRoot();
-        traverseStates(root,errorMessage);
+        traverseStates(root, errorMessage);
     }
 
     public void traverseStates(Node node, String errorMessage) {
-
         int nodeIndex = node.getNr();
 
-        if(!node.isRoot()) {
-
+        if (!node.isRoot()) {
             int nodeParentIndex = node.getParent().getNr();
             int childSize = ancestralStates.get(makeCachingIndexStates(nodeIndex)).size();
             int parentSize = ancestralStates.get(makeCachingIndexStates(nodeParentIndex)).size();
-            if(parentSize > childSize) {
+            if (parentSize > childSize) {
                 Log.info.println(errorMessage);
             }
-
         }
 
         if (!node.isLeaf()) {
-
             final Node child1 = node.getLeft();
-            traverseStates(child1,errorMessage);
+            traverseStates(child1, errorMessage);
             final Node child2 = node.getRight();
-            traverseStates(child2,errorMessage);
-
+            traverseStates(child2, errorMessage);
         }
-
-
-
-
     }
-
 }
