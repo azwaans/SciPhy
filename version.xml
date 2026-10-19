@@ -1,7 +1,7 @@
-<package name="sciphy" version="0.0.1">
-    <depends on='BEAST.base' atleast='2.7.0'/>
-    <depends on='BEAST.app' atleast='2.7.0'/>
-    <depends on="feast" atleast="10.0.0"/>
+<package name="sciphy" version="1.0.0">
+    <depends on='BEAST.base' atleast='2.8.0'/>
+    <depends on='BEAST.app' atleast='2.8.0'/>
+    <depends on="feast" atleast="11.0.1"/>
 
     <service type="beast.base.evolution.datatype.DataType">
         <provider classname="sciphy.evolution.datatype.SciPhyData"/>

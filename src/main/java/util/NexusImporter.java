@@ -24,7 +24,7 @@ public class NexusImporter implements AlignmentImporter {
     @Override
     public List<BEASTInterface> loadFile(File file) {
         List<BEASTInterface> selectedBEASTObjects = new ArrayList<>();
-        NexusParser parser = new NexusParser();
+        sciphy.util.NexusParser parser = new sciphy.util.NexusParser();
         try {
             parser.parseFile(file);
             if (parser.filteredAlignments.size() > 0) {

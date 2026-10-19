@@ -3,15 +3,19 @@ package sciphy.evolution.substitutionmodel;
 
 import beast.base.core.Description;
 import beast.base.core.Input;
+import beast.base.core.Log;
 import beast.base.evolution.datatype.Binary;
 import beast.base.evolution.datatype.StandardData;
 import beast.base.evolution.datatype.IntegerData;
-import beast.base.inference.parameter.RealParameter;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.substitutionmodel.EigenDecomposition;
-import beast.base.evolution.substitutionmodel.SubstitutionModel;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.evolution.substitutionmodel.Base;
 import beast.base.evolution.tree.Node;
-import org.apache.commons.math.distribution.PoissonDistributionImpl;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.type.RealScalar;
+import beast.base.spec.type.Simplex;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,26 +25,26 @@ import java.util.List;
 @Description("Calculates transition probabilities sequence transitions from an ancestral node to a child node. " +
         "Assume that the sequences proposed represent valid transition pairs.")
 
-public class SciPhySubstitutionModel extends SubstitutionModel.Base {
-    final public Input<RealParameter> editProbabilitiesInput = new Input<>("editProbabilities",
+public class SciPhySubstitutionModel extends Base {
+    final public Input<Simplex> editProbabilitiesInput = new Input<>("editProbabilities",
             "Edit probabilities for the typewriter process", Input.Validate.REQUIRED);
 
-    final public Input<RealParameter>  missingRateInput = new Input<>(
+    final public Input<RealScalar<NonNegativeReal>>  missingRateInput = new Input<>(
             "missingRate",
             "Rate at which the barcode goes missing heritably. Default 0.0.",
-            new RealParameter("0.0"));
+            new RealScalarParam(0.0, NonNegativeReal.INSTANCE));
 
-    final public Input<RealParameter>  missingProbInput = new Input<>(
+    final public Input<RealScalar<NonNegativeReal>>  missingProbInput = new Input<>(
             "missingProbability",
             "Probability that a barcode goes missing at the tips. Default 0.0",
-            new RealParameter("0.0"));
+            new RealScalarParam(0.0, NonNegativeReal.INSTANCE));
 
     /**
      * edit insertion rate  *
      */
-    protected RealParameter editProbabilities;
-    protected RealParameter missRate;
-    protected RealParameter missProbability;
+    protected Simplex editProbabilities;
+    protected RealScalar<NonNegativeReal> missRate;
+    protected RealScalar<NonNegativeReal> missProbability;
     double[] editProbs;
     double missingRate;
     double missingProbability;
@@ -55,7 +59,11 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
         super.initAndValidate();
         // Get edit probabilities and check correct input
         editProbabilities = editProbabilitiesInput.get();
-        editProbs = editProbabilities.getDoubleValues();
+        editProbs = new double[editProbabilities.size()];
+        for (int i = 0; i < editProbabilities.size(); i++) {
+            editProbs[i] = editProbabilities.get(i);
+        }
+
 
         double insertProbabilitiesSum = Arrays.stream(editProbs).sum();
         if (Math.abs(insertProbabilitiesSum - 1.0) > 1e-6) {
@@ -75,15 +83,20 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
         missingRate = 0.0;
         if (missingRateInput.get() != null) {
             missRate = missingRateInput.get();
-            missingRate = missRate.getValue();
+            missingRate = missRate.get();
         }
 
         missingProbability = 0.0;
         if (missingProbInput.get() != null) {
             missProbability = missingProbInput.get();
-            missingProbability = missProbability.getValue();
+            missingProbability = missProbability.get();
         }
 
+    }
+
+    @Override
+    public double[] getRateMatrix(Node node) {
+        return new double[0];
     }
 
 
@@ -157,7 +170,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
                 int nrOfPossibleInserts = arrayLength - startState.size();
 
                 //initialise the poisson distribution with mean rate * distance
-                org.apache.commons.math.distribution.PoissonDistribution poissonDistribution = new PoissonDistributionImpl(distance);
+                org.apache.commons.math3.distribution.PoissonDistribution poissonDistribution = new PoissonDistribution(distance);
 
                 //calculate the transition probability for the case where all available positions are edited in
                 // This is the absorbing state in the poisson process
@@ -270,7 +283,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
             int nrOfPossibleInserts = arrayLength - startState.size();
 
             //initialise the poisson distribution with mean rate * distance
-            org.apache.commons.math.distribution.PoissonDistribution poissonDistribution = new PoissonDistributionImpl(distance);
+            org.apache.commons.math3.distribution.PoissonDistribution poissonDistribution = new PoissonDistribution(distance);
 
             //calculate the transition probability for the case where all available positions are edited in
             // This is the absorbing state in the poisson process
@@ -308,7 +321,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      * @param nbrOfPossibleInserts  is the number of available positions until the absorbing state is reached
      * @param dist is the poisson
      */
-    public double calculateAbsorbingStateProbability(org.apache.commons.math.distribution.PoissonDistribution dist,int nbrOfPossibleInserts) {
+    public double calculateAbsorbingStateProbability(org.apache.commons.math3.distribution.PoissonDistribution dist,int nbrOfPossibleInserts) {
 
         double absorbingStateProbability = 1.0;
 
@@ -343,7 +356,7 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      *
      */
     public double[] getInsertProbabilities() {
-        return editProbs;
+        return this.editProbs;
     }
 
     /**
@@ -369,9 +382,11 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      */
     @Override
     public void store() {
-        editProbs = editProbabilities.getDoubleValues();
-        missingProbability = missProbability.getValue();
-        missingRate = missRate.getValue();
+        for (int i = 0; i < editProbabilities.size(); i++) {
+            editProbs[i] = editProbabilities.get(i);
+        }
+        missingProbability = missProbability.get();
+        missingRate = missRate.get();
         super.store();
     }
 
@@ -380,9 +395,11 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
      */
     @Override
     public void restore() {
-        editProbs = editProbabilities.getDoubleValues();
-        missingProbability = missProbability.getValue();
-        missingRate = missRate.getValue();
+        for (int i = 0; i < editProbabilities.size(); i++) {
+            editProbs[i] = editProbabilities.get(i);
+        }
+        missingProbability = missProbability.get();
+        missingRate = missRate.get();
         super.restore();
 
     }
@@ -390,9 +407,12 @@ public class SciPhySubstitutionModel extends SubstitutionModel.Base {
     @Override
     protected boolean requiresRecalculation() {
         // we only get here if something is dirty
-        editProbs = editProbabilities.getDoubleValues();
-        missingProbability = missProbability.getValue();
-        missingRate = missRate.getValue();
+        //todo check better ways to do so
+        for (int i = 0; i < editProbabilities.size(); i++) {
+            editProbs[i] = editProbabilities.get(i);
+        }
+        missingProbability = missProbability.get();
+        missingRate = missRate.get();
         return true;
     }
 

@@ -5,19 +5,19 @@ import java.util.*;
 
 import beast.base.core.Description;
 import beast.base.core.Log;
-import beast.base.evolution.likelihood.GenericTreeLikelihood;
+import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
 import beast.base.inference.State;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
-import beast.base.evolution.branchratemodel.BranchRateModel;
-import beast.base.evolution.branchratemodel.StrictClockModel;
-import beast.base.evolution.sitemodel.SiteModel;
+import beast.base.spec.evolution.branchratemodel.Base;
+import beast.base.spec.evolution.branchratemodel.StrictClockModel;
+import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.substitutionmodel.SubstitutionModel;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeInterface;
+import beast.base.spec.type.IntScalar;
+import beast.base.spec.type.RealScalar;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import static sciphy.util.LogSum.logSum;
 
@@ -29,15 +29,15 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
 
 
-    final public Input<RealParameter> originTimeInput = new Input<>("origin", "Duration of the experiment");
+    final public Input<RealScalar> originTimeInput = new Input<>("origin", "Duration of the experiment");
 
-    final public Input<IntegerParameter> arrayLengthInput = new Input<>("arrayLength", "Number of positions in the target BC", Validate.REQUIRED);
+    final public Input<IntScalar> arrayLengthInput = new Input<>("arrayLength", "Number of positions in the target BC", Validate.REQUIRED);
 
     final public Input<Boolean> useScalingInput = new Input<Boolean>("useScaling", "Whether or not to scale the log likelihood", false,
             Validate.OPTIONAL);
 
     protected SciPhySubstitutionModel substitutionModel;
-    protected BranchRateModel.Base branchRateModel;
+    protected Base branchRateModel;
     protected SiteModel.Base m_siteModel;
     protected double originTime;
     protected int nodeCount;
@@ -86,7 +86,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
     @Override
     public void initAndValidate() {
-        arrayLength = arrayLengthInput.get().getValue();
+        arrayLength = arrayLengthInput.get().get();
         missingState = new ArrayList<>();
         lostState = new ArrayList<>();
         uneditedState = new ArrayList<>();
@@ -132,7 +132,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
         }
         originTime = 0.0;
         if (originTimeInput.get() != null) {
-            originTime = originTimeInput.get().getValue();
+            originTime = originTimeInput.get().get();
             if (originTime < 0.0) {
                 throw new IllegalArgumentException(String.format(
                         "Invalid origin time input: ensure that origin>0"));

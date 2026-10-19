@@ -7,13 +7,14 @@ import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
 import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.datatype.DataType;
-import beast.base.evolution.sitemodel.SiteModel;
+
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
-import beast.base.inference.parameter.RealParameter;
-import beast.base.util.Randomizer;
+import beast.base.spec.evolution.sitemodel.SiteModel;
+import beast.base.spec.type.RealScalar;
 import beast.pkgmgmt.BEASTClassLoader;
 import beast.pkgmgmt.PackageManager;
+import beast.base.util.Randomizer;
 import feast.nexus.CharactersBlock;
 import feast.nexus.NexusBuilder;
 import feast.nexus.TaxaBlock;
@@ -24,11 +25,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 
 @Description("A more flexible alignment simulator adapted from Tim Vaughan's feast implementation")
-public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
+public class SimulatedSciPhyAlignment extends Alignment {
 
     public Input<Tree> treeInput = new Input<>(
             "tree",
@@ -51,17 +51,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             "Number of insertions to add per site",
             Input.Validate.REQUIRED);
 
-    public Input<RealParameter>  missingRateInput = new Input<>(
-            "missingRate",
-            "Rate at which the barcode goes missing heritably (in reality a scaler from the clock rate)",
-            Input.Validate.OPTIONAL);
-
-    public Input<RealParameter>  missingProbInput = new Input<>(
-            "missingProbability",
-            "Probability that a barcode goes missing at the tips",
-            Input.Validate.OPTIONAL);
-
-    public Input<RealParameter> originInput = new Input<>(
+    public Input<RealScalar> originInput = new Input<>(
             "origin", "Start of the process, usually the experiment",
             Input.Validate.OPTIONAL);
 
@@ -76,13 +66,10 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
     private int arrayLength;
     private DataType dataType;
     private double originHeight;
-    private double missingRate;
-    private double missingProbability;
-    public int[] missingState;
 
     private String ancestralSeqStr;
 
-    public SimulatedSciPhyAlignmentHeritableMissingBcodes() {
+    public SimulatedSciPhyAlignment() {
         sequenceInput.setRule(Input.Validate.OPTIONAL);
     }
 
@@ -98,31 +85,8 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
         sequences.clear();
 
         if (originInput.get() != null) {
-            originHeight = originInput.get().getValue();
+            originHeight = originInput.get().get();
         }
-
-        missingRate = 0.0;
-        if (missingRateInput.get() != null) {
-            missingRate = missingRateInput.get().getValue();
-            Log.info.println("missing rate: " + missingRate);
-
-        }
-
-        missingProbability = 0.0;
-        if (missingProbInput.get() != null) {
-            missingProbability = missingProbInput.get().getValue();
-            Log.info.println("missing prob: " + missingProbability);
-        }
-
-        // creating the missing state, encoded as an array of -1.
-        //todo: make this flexible in array length
-        missingState = new int[] {
-            -1,
-            -1,
-            -1,
-            -1,
-            -1
-        };
 
         grabDataType();
 
@@ -167,34 +131,19 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             Log.info.println("clock rates: " + clockRate);
 
             int nPossibleInserts = arrayLength;
+            long nPotentialInserts = Randomizer.nextPoisson(deltaT * clockRate);
 
-            //see if the bcode goes missing
-            double missingProb = 1 - Math.exp(-deltaT * missingRate  );
-            double indicator = Randomizer.nextDouble();
+            int insertionIndex = 0;
 
-            if(indicator < missingProb) {
-                //For now, use -1 as a alias for missing character
-                rootSequence = missingState.clone();
+            // Add potential inserts while there are still possible insertion positions
+            while (nPossibleInserts > 0 && nPotentialInserts > 0) {
 
-            }
+                int newInsertion = Randomizer.randomChoicePDF(transitionProbs) + 1;
+                rootSequence[insertionIndex] = newInsertion;
 
-            else {
-            //proceed with simulation
-
-                long nPotentialInserts = Randomizer.nextPoisson(deltaT * clockRate );
-
-                int insertionIndex = 0;
-
-                // Add potential inserts while there are still possible insertion positions
-                while (nPossibleInserts > 0 && nPotentialInserts > 0) {
-
-                    int newInsertion = Randomizer.randomChoicePDF(transitionProbs) + 1;
-                    rootSequence[insertionIndex] = newInsertion;
-
-                    insertionIndex++;
-                    nPossibleInserts--;
-                    nPotentialInserts--;
-                }
+                insertionIndex++;
+                nPossibleInserts--;
+                nPotentialInserts--;
             }
         }
 
@@ -212,7 +161,6 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
                 taxonName = tree.getNode(leafIdx).getID();
             else
                 taxonName = "t" + leafIdx;
-
             //note to self: the sequence input seqString is e.g. "5,3,8,0,0"
             //where is it modified to "taxonNumber:5,3,8,0,0"? (in CharactersBlock class)
             sequenceInput.setValue(new Sequence(taxonName, seqString), this);
@@ -243,65 +191,33 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             // Draw characters on child sequence
             int[] childSequence = parentSequence.clone();
 
-           if(! childSequence.equals(missingState)) {
-               //if the bcode isn't missing already, proceed with simulation
+            // find site where next insertion could happen, i.e. the next unedited state '0'
+            int insertionIndex = 0;
+            while ((insertionIndex < arrayLength) && (childSequence[insertionIndex] != 0)) {
+                insertionIndex++;
+            }
 
-               //1st, check whether the barcode will go missing on the branch
-               double missingProb = 1 - Math.exp(-deltaT * missingRate );
-               double indicator = Randomizer.nextDouble();
+            if (insertionIndex == arrayLength) {
+                // then sequence is fully edited, no further simulation necessary
+                ;
+            } else {
+                // sample number of new insertions
+                int nPossibleInserts = arrayLength - insertionIndex;
+                long nPotentialInserts = Randomizer.nextPoisson(deltaT * clockRate);
 
-               if (indicator < missingProb) {
-                   //For now, use -1 as a alias for missing character
-                   int[] missingBcode = missingState.clone();
-                   childSequence = missingBcode;
+                // Add potential inserts while there are still possible insertion positions
+                while (nPossibleInserts > 0 && nPotentialInserts > 0) {
 
-               }
+                    int newInsertion = Randomizer.randomChoicePDF(transitionProbs) + 1;
+                    childSequence[insertionIndex] = newInsertion;
 
-               //if not missing, actuallly proceed with the normal simulation
-               else{
-
-               // find site where next insertion could happen, i.e. the next unedited state '0'
-               int insertionIndex = 0;
-               while ((insertionIndex < arrayLength) && (childSequence[insertionIndex] != 0)) {
-                   insertionIndex++;
-               }
-
-                   if (insertionIndex == arrayLength) {
-                       // then sequence is fully edited, no further simulation necessary
-                       ;
-                   } else {
-
-                       // sample number of new insertions
-                       int nPossibleInserts = arrayLength - insertionIndex;
-                       long nPotentialInserts = Randomizer.nextPoisson(deltaT * clockRate);
-
-                       // Add potential inserts while there are still possible insertion positions
-                       while (nPossibleInserts > 0 && nPotentialInserts > 0) {
-
-                           int newInsertion = Randomizer.randomChoicePDF(transitionProbs) + 1;
-                           childSequence[insertionIndex] = newInsertion;
-
-                           insertionIndex++;
-                           nPossibleInserts--;
-                           nPotentialInserts--;
-                       }
-
-                   }
-               }
-           }
+                    insertionIndex++;
+                    nPossibleInserts--;
+                    nPotentialInserts--;
+                }
+            }
 
             if (child.isLeaf()) {
-
-                //see if the bcode goes missing
-                 double indicator = Randomizer.nextDouble();
-
-                //replace the bcode with a missing character
-                if(indicator < missingProbability) {
-                    //For now, use -1 as a alias for missing character
-                    childSequence = missingState.clone();
-                }
-
-
                 System.arraycopy(childSequence, 0,
                         regionAlignment[child.getNr()], 0, childSequence.length);
             } else {
@@ -321,7 +237,7 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
         } else {
 
             List<String> dataTypeDescList = new ArrayList<>();
-            List<String> classNames = PackageManager.find(DataType.class, "beast.evolution.datatype");
+            List<String> classNames = PackageManager.find(beast.base.evolution.datatype.DataType.class, "beast.evolution.datatype");
             for (String className : classNames) {
                 try {
                     DataType thisDataType = (DataType) BEASTClassLoader.forName(className).newInstance();

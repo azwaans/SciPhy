@@ -1,15 +1,18 @@
 package sciphy;
 
 import beast.base.core.Log;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
-import beast.base.evolution.branchratemodel.StrictClockModel;
-import beast.base.evolution.sitemodel.SiteModel;
-import beast.base.evolution.substitutionmodel.Frequencies;
+import beast.base.spec.domain.Int;
+import beast.base.spec.domain.Real;
+import beast.base.spec.evolution.branchratemodel.StrictClockModel;
+import beast.base.spec.evolution.sitemodel.SiteModel;
+import beast.base.spec.evolution.substitutionmodel.Frequencies;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.inference.parameter.SimplexParam;
 import sciphy.evolution.likelihood.SciPhyParsimony;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import org.junit.Test;
@@ -42,8 +45,8 @@ public class SciPhyParsimonyTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
+        SimplexParam editprobs = new SimplexParam(new double[]{1.0, 0, 0,0});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0, 0, 0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);        //site model
@@ -51,10 +54,10 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -112,8 +115,8 @@ public class SciPhyParsimonyTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0, 0, 0});
+        SimplexParam editprobs = new SimplexParam(new double[]{1.0, 0, 0,0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -123,11 +126,11 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
-        RealParameter orig = new RealParameter("6");
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
+        RealScalarParam orig = new RealScalarParam(6,Real.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength, "origin", orig);
 
@@ -187,8 +190,8 @@ public class SciPhyParsimonyTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0, 0, 0});
+        SimplexParam editprobs = new SimplexParam(new double[]{1.0, 0, 0,0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -198,10 +201,10 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -268,8 +271,8 @@ public class SciPhyParsimonyTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0, 0, 0});
+        SimplexParam editprobs = new SimplexParam(new double[]{1.0, 0, 0,0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -279,10 +282,10 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -349,8 +352,8 @@ public class SciPhyParsimonyTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0, 0, 0});
+        SimplexParam editprobs = new SimplexParam(new double[]{1.0, 0, 0,0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -360,10 +363,10 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5, Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam(5, Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -432,8 +435,8 @@ public class SciPhyParsimonyTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter editprobs = new RealParameter("0.5 0.5");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam(new double[] {0.5, 0.5});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -443,10 +446,10 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -524,8 +527,8 @@ public class SciPhyParsimonyTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8, 0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -536,14 +539,14 @@ public class SciPhyParsimonyTest {
 
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam(6,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
 
-        parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+        parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
 
         //initialise partialLikelihoods
@@ -590,8 +593,8 @@ public class SciPhyParsimonyTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
-        RealParameter editprobs = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -601,14 +604,14 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam(6,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
 
-        parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+        parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
 
         //initialise partialLikelihoods
@@ -654,8 +657,8 @@ public class SciPhyParsimonyTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
-        RealParameter editprobs = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -665,11 +668,11 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam(6,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -713,8 +716,8 @@ public class SciPhyParsimonyTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8, 0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -723,11 +726,11 @@ public class SciPhyParsimonyTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //parsimony class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("4");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam(4,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -818,8 +821,8 @@ public class SciPhyParsimonyTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8, 0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -830,11 +833,11 @@ public class SciPhyParsimonyTest {
 
         //parsimony class
 
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam(0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("4");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam(4,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam(5,Int.INSTANCE);
 
         parsimony.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 

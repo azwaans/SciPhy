@@ -1,12 +1,15 @@
-    <beast version='2.0'
-           namespace='beast.base.inference
-                 :beast.base.inference.parameter
-                 :beast.base.inference.operator
-                 :beast.base.evolution.operator
-                 :beast.base.evolution.alignment
-                 :bdsky.evolution
-                 :beast.base.evolution.sitemodel
-                 :beast.base.evolution.tree.TreeLengthLogger'
+    <beast version='2.8'
+           namespace="lineageTree.substitutionmodel
+       :beast.pkgmgmt
+       :beast.base.inference
+       :beast.base.spec.inference
+       :beast.base.spec.inference.parameter
+       :beast.base.evolution.alignment
+       :beast.base.spec.evolution.tree.Coalescent
+       :beast.base.spec.evolution.tree.coalescent
+       :beast.base.spec.inference.operator
+       :beast.base.evolution.operator
+       :sciphy.evolution.likelihood.SciPhyTreeLikelihood"
             >
 
 
@@ -6048,16 +6051,15 @@
         <sequence spec="Sequence" taxon="499"  value="2,10,4,2"/>
     </data>
 
-    <map name="Uniform" >beast.base.inference.distribution.Uniform</map>
-    <map name="Exponential" >beast.base.inference.distribution.Exponential</map>
-    <map name="LogNormal" >beast.base.inference.distribution.LogNormalDistributionModel</map>
-    <map name="Normal" >beast.base.inference.distribution.Normal</map>
-    <map name="Beta" >beast.base.inference.distribution.Beta</map>
-    <map name="Gamma" >beast.base.inference.distribution.Gamma</map>
-    <map name="LaplaceDistribution" >beast.base.inference.distribution.LaplaceDistribution</map>
-    <map name="prior" >beast.base.inference.distribution.Prior</map>
-    <map name="InverseGamma" >beast.base.inference.distribution.InverseGamma</map>
-    <map name="OneOnX" >beast.base.inference.distribution.OneOnX</map>
+    <map name="Exponential" >beast.base.spec.inference.distribution.Exponential</map>
+    <map name="LogNormal" >beast.base.spec.inference.distribution.LogNormal</map>
+    <map name="Normal" >beast.base.spec.inference.distribution.Normal</map>
+    <map name="Beta" >beast.base.spec.inference.distribution.Beta</map>
+    <map name="Gamma" >beast.base.spec.inference.distribution.Gamma</map>
+    <map name="LaplaceDistribution" >beast.base.spec.inference.distribution.Laplace</map>
+    <map name="prior" >beast.base.spec.inference.distribution.TensorDistribution</map>
+    <map name="InverseGamma" >beast.base.spec.inference.distribution.InverseGamma</map>
+    <map name="LogUniform" >beast.base.spec.inference.distribution.LogUniform</map>
 
     <!-- set of all cells -->
     <taxa id="TaxonSet.0" spec="TaxonSet">
@@ -6072,12 +6074,12 @@
     />
 
 
-    <!-- run MCMC with 10^9 steps -->
+    <!-- run MCMC with 10^5 steps -->
     <run id="mcmc" spec="MCMC" chainLength="100000">
         <state id="state" spec="State" storeEvery="100">
 
             <!--starting tree -->
-            <stateNode id="sciphyTree" spec="sciphy.evolution.tree.startingTree" rootHeight="20"
+            <stateNode id="SciPhyTree" spec="sciphy.evolution.tree.startingTree" rootHeight="20"
                        taxa="@data_ATGGTAAG" scarringHeight="20"
                        scarringDuration="5" sequencesAreClustered="false">
                 <trait idref="dateTrait.t:alignment"/>
@@ -6085,48 +6087,31 @@
             </stateNode>
             
             <!-- editing model parameters -->
-            <parameter id="editProbs" spec="parameter.RealParameter"
-                       lower="0.0" name="stateNode"
-                       upper="1000">
-
-                0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.82
-
+            <parameter id="editProbs" spec="SimplexParam"
+                       name="stateNode" dimension="19"
+            >0.05263157894736842
             </parameter>
 
-            <parameter id="clockRate" spec="parameter.RealParameter"
-                       dimension="1" lower="0.0" name="stateNode"
-                       upper="1000"> 0.1 </parameter>
+            <parameter id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.2</parameter>
+
 
             <!-- population process parameters -->
-            <parameter id="birthRate" spec="parameter.RealParameter" dimension="1" lower="0.0" name="stateNode" upper="Infinity">0.5</parameter>
-
-            <parameter id="deathRate" spec="parameter.RealParameter"
-                       dimension="1" lower="0.0" name="stateNode"
-                       upper="Infinity">0.4</parameter>
-
-            <!-- The sampling rate through time is set to 0 as we only
-                 sample at the end of the experiment with sampling
-                 proportion rho -->
-            <parameter id="samplingRate" spec="parameter.RealParameter"
-                       dimension="1" lower="0.0" name="stateNode"
-                       upper="1.0">0.0</parameter>
+            <parameter id="netGrowthRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.5</parameter>
+            <parameter id="turnoverRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.4</parameter>
+            
 
             <!--fix origin to experiment duration, e.g. 25 -->
-            <parameter id="origin"
-                       spec="parameter.RealParameter" name="stateNode">25
-            </parameter>
+            <!-- fixed origin -->
+            <parameter id="origin" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">25</parameter>
+
 
             <!-- fix sampling proportion to truth -->
-            <parameter id="samplingProportion"
-                       spec="parameter.RealParameter" lower="0.0"
-                       name="stateNode" upper="1.0">0.0004 </parameter>
+            <parameter id="samplingProportion" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.0004</parameter>
 
-            <parameter id="freqParameter.s:alignment"
-                       spec="parameter.RealParameter" dimension="4"
-                       lower="0.0" name="stateNode"
-                       upper="1.0">0.25</parameter>
+
+            <parameter id="freqParameter" spec="SimplexParam"  name="stateNode" >0.25 0.25 0.25 0.25</parameter>
+
         </state>
-        
 
         <!-- define posterior -->
         <distribution id="posterior" spec="beast.base.inference.CompoundDistribution">
@@ -6134,136 +6119,112 @@
             <!-- tree prior or phylodynamic model. Here, we use a birth-death sampling
             model -->
             <distribution id="prior" spec="beast.base.inference.CompoundDistribution">
-                <distribution id="birthDeathMigration.t:alignment" spec="bdsky.evolution.speciation.BirthDeathSkylineModel"
-                              birthRate="@birthRate" deathRate="@deathRate" samplingRate="@samplingRate"
-                              contemp="true" origin="@origin" rho="@samplingProportion"
-                              tree="@sciphyTree" conditionOnSurvival="true">
+                <distribution id="birthDeathMigration.t:simulatedAlignment"
+                              spec="beast.base.spec.evolution.speciation.BirthDeathGernhard08Model"
+                              sampleProbability="@samplingProportion"
+                              birthDiffRate="@netGrowthRate"
+                              relativeDeathRate="@turnoverRate"
+                              tree="@SciPhyTree"
+                              originHeight="@origin"
+                >
                 </distribution>
+                <!-- prior distributions on editing parameters -->
+                <!-- prior on the editing probabilities -->
+                <distribution id="editProbsPrior" param="@editProbs" spec="beast.base.spec.inference.distribution.Dirichlet" alpha="1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5"/>
 
-                <!-- priors on phylogenetic parameters -->
-
-                <!-- 95% HPD [0.00065, 0.25, 0.95] -->
-                <prior
-                        id="editProbsPrior" name="distribution"
-                        x="@editProbs">
-                    <Dirichlet name="distr" spec="beast.base.inference.distribution.Dirichlet">
-                        <parameter  spec="parameter.RealParameter"
-                                    estimate="false"
-                                    name="alpha">
-                            1.5 1.5 1.5 1.5 1.5
-                            1.5 1.5 1.5 1.5 1.5
-                            1.5 1.5 1.5 1.5 1.5
-                            1.5 1.5 1.5 1.5
-                        </parameter>
-                    </Dirichlet>
-                </prior>
-
-
-                <!-- 95% HPD [0.06, 0.13, 0.3] -->
-                <prior id="ClockPrior.c:alignment" name="distribution" x="@clockRate">
-                    <LogNormal name="distr" M="-2" S="0.5"/>
-                </prior>
+                <!-- prior on the clock rate -->
+                <distribution id="clockPrior" param="@clockRate" spec="beast.base.spec.inference.distribution.LogNormal" M="-2" S="0.5"/>
 
                 <!-- prior distributions on phylodynamic parameters -->
-                <!-- 95% HPD [0.1, 0.5, 2.8] -->
-                <prior id="birthRatePrior" name="distribution" x="@birthRate">
-                    <LogNormal name="distr">
-                        <parameter spec="parameter.RealParameter"
-                                   estimate="false" name="M">-0.6</parameter>
-                        <parameter spec="parameter.RealParameter"
-                                   estimate="false"  name="S">1</parameter>
-                    </LogNormal>
-                </prior>
+                <!-- prior on the net growth rate-->
+                <distribution id="netGrowthPrior" param="@netGrowthRate" spec="beast.base.spec.inference.distribution.LogNormal" M="-0.8" S="1"/>
 
-                <!-- 95% HPD [0.03, 0.14, 0.7] -->
-                <prior id="deathRatePrior" name="distribution" x="@deathRate">
-                    <LogNormal  name="distr">
-                        <parameter spec="parameter.RealParameter"
-                                   estimate="false" name="M">-2</parameter>
-                        <parameter spec="parameter.RealParameter"
-                                   estimate="false"  name="S">1</parameter>
-                    </LogNormal>
-                </prior>
+                <!-- prior on the turnover (death/birth) -->
+                <distribution id="turnoverPrior" param="@turnoverRate" spec="beast.base.spec.inference.distribution.Uniform" lower="0.0" upper="1.0"/>
             </distribution>
 
             <!-- SciPhy tree likelihood -->
             <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution">
                 <!-- Alignment 1 -->
-                <distribution id="treeLikelihood.1" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@data_ATGGTAAG" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
-                    <siteModel id="SiteModel.s:sciphyTest" spec="SiteModel" >
-                        <parameter id="mutationRate.s:sciphyTest" spec="parameter.RealParameter" estimate="false" name="mutationRate">1.0</parameter>
-                        <parameter id="proportionInvariant.s:sciphyTest" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
-                        <substModel id="submodel.s:sciphyTest" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs">
-                            <frequencies id="freq" spec="beast.base.evolution.substitutionmodel.Frequencies" frequencies="1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" estimate="false"/>
+                <distribution id="treeLikelihood.1" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@data_ATGGTAAG" tree="@SciPhyTree" origin="@origin" useScaling="true" >
+                    <siteModel id="siteModel" spec="beast.base.spec.evolution.sitemodel.SiteModel">
+                        <parameter id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</parameter>
+                        <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs">
+                            <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
+                                <frequencies id="frequencies" spec="parameter.SimplexParam" estimate="false" > 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
+                            </frequencies>
                         </substModel>
                     </siteModel>
-                    <branchRateModel id="StrictClock.c:sciphyTest" spec="beast.base.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate"/>
+                    <parameter id="arrayLength5" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">5</parameter>
+                    <branchRateModel id="strictClock" spec="beast.base.spec.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate"/>
                     <!-- Alignment 2 -->
                 </distribution>
-                <distribution id="treeLikelihood.2" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_ATTTATAT" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.2" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_ATTTATAT" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 3 -->
-                <distribution id="treeLikelihood.3" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_ATTTGGTT" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.3" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_ATTTGGTT" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5" >
                 </distribution>
                 <!-- Alignment 4 -->
-                <distribution id="treeLikelihood.4" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_GCAGGGTG" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.4" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_GCAGGGTG" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 5 -->
-                <distribution id="treeLikelihood.5" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_GTAAAGAT" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.5" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_GTAAAGAT" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 6 -->
-                <distribution id="treeLikelihood.6" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TAGATTTT" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.6" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TAGATTTT" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 7 -->
-                <distribution id="treeLikelihood.7" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TGCGATTT" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.7" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TGCGATTT" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 8 -->
-                <distribution id="treeLikelihood.8" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TGGACGAC" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="4">
+                <distribution id="treeLikelihood.8" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TGGACGAC" tree="@SciPhyTree" origin="@origin" useScaling="true">
+                    <parameter id="arrayLength4" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">4</parameter>
                 </distribution>
                 <!-- Alignment 9 -->
-                <distribution id="treeLikelihood.9" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TGGTTTTG" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="4">
+                <distribution id="treeLikelihood.9" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TGGTTTTG" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength4">
                 </distribution>
                 <!-- Alignment 10 -->
-                <distribution id="treeLikelihood.10" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TTAGATTG" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.10" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TTAGATTG" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 11 -->
-                <distribution id="treeLikelihood.11" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TTGAGGTG" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="5">
+                <distribution id="treeLikelihood.11" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TTGAGGTG" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength5">
                 </distribution>
                 <!-- Alignment 12 -->
-                <distribution id="treeLikelihood.12" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@SiteModel.s:sciphyTest" branchRateModel="@StrictClock.c:sciphyTest" data="@data_TTTCGTGA" tree="@sciphyTree" origin="@origin" useScaling="true" arrayLength="4">
+                <distribution id="treeLikelihood.12" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TTTCGTGA" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength4">
                 </distribution>
             </distribution>
         </distribution>
 
         <!-- phylogenetic operators -->
         <operator id="editProbsOperator"
-                  spec="DeltaExchangeOperator"
+                  spec="beast.base.spec.inference.operator.DeltaExchangeOperator"
                   parameter="@editProbs"
                   weight="60.0"/>
 
-        <operator id="clockRateScaler" spec="ScaleOperator"
+        <operator id="clockRateScaler" spec="beast.base.spec.inference.operator.ScaleOperator"
                   parameter="@clockRate" scaleFactor="0.8" weight="3.0"/>
 
         <!-- tree operators -->
-        <operator spec="ScaleOperator" tree="@sciphyTree" weight="10.0"/>
-        <operator spec="WilsonBalding" tree="@sciphyTree" weight="10.0"/>
-        <operator spec="Uniform" tree="@sciphyTree"
+        <operator spec="beast.base.spec.evolution.operator.ScaleTreeOperator" tree="@SciPhyTree" weight="10.0"/>
+
+        <operator spec="WilsonBalding" tree="@SciPhyTree" weight="10.0"/>
+        <operator spec="beast.base.spec.inference.distribution.Uniform" tree="@SciPhyTree"
                   weight="10.0"/>
 
         <operator spec="Exchange"
-                  isNarrow="true" tree="@sciphyTree"
+                  isNarrow="true" tree="@SciPhyTree"
                   weight="10.0"/>
-        <operator spec="SubtreeSlide" tree="@sciphyTree" weight="10.0"/>
+        <operator spec="beast.base.evolution.operator.kernel.BactrianSubtreeSlide" tree="@SciPhyTree" weight="10.0"/>
 
 
         <!-- Phylodynamic operators -->
-        <operator id="birthRateScaler" spec="ScaleOperator" parameter="@birthRate" scaleFactor="0.8" weight="3.0"/>
+        <operator id="turnoverRateScaler" spec="beast.base.spec.inference.operator.ScaleOperator" parameter="@turnoverRate" scaleFactor="0.8" weight="3.0"/>
 
-        <operator id="deathRateScaler" spec="ScaleOperator" parameter="@deathRate" scaleFactor="0.8" weight="3.0"/>
+        <operator id="netGrowthRateScaler" spec="beast.base.spec.inference.operator.ScaleOperator" parameter="@netGrowthRate" scaleFactor="0.8" weight="3.0"/>
 
-        <operator id="updownBR" spec="UpDownOperator" scaleFactor="0.9" weight="3.0">
-            <up idref="birthRate"/>
-            <down idref="deathRate"/>
+        <operator id="updownBR" spec="beast.base.spec.evolution.operator.UpDownOperator" scaleFactor="0.9" weight="3.0">
+            <up idref="turnoverRate"/>
+            <down idref="netGrowthRate"/>
         </operator>
 
         <!-- Loggers -->
@@ -6271,12 +6232,12 @@
             <log idref="posterior"/>
             <log idref="likelihood"/>
             <log idref="prior"/>
-            <log id="treeHeight.t:alignment" spec="beast.base.evolution.tree.TreeHeightLogger" tree="@sciphyTree"/>
-            <log id="treeLength.t:alignment" spec="beast.base.evolution.tree.TreeStatLogger" logHeigth="true" tree="@sciphyTree"/>
+            <log id="treeHeight" spec="beast.base.evolution.tree.TreeStatLogger" logHeight="true" tree="@SciPhyTree"/>
+            <log id="treeLength" spec="beast.base.evolution.tree.TreeStatLogger" logLength="true" tree="@SciPhyTree"/>
             <log idref="editProbs"/>
-            <log idref="birthRate"/>
+            <log idref="netGrowthRate"/>
             <log idref="samplingProportion"/>
-            <log idref="deathRate"/>
+            <log idref="turnoverRate"/>
             <log idref="clockRate"/>
         </logger>
 
@@ -6302,8 +6263,8 @@
             <log idref="prior"/>
         </logger>
 
-        <logger id="treelog.t:alignment" spec="Logger" fileName="$(filebase).$(tree).$(seed).trees" logEvery="500" mode="tree">
-            <log idref="sciphyTree" printMetaData="true"/>
+        <logger id="treelog.t:alignment" spec="Logger" fileName="$(filebase).$(seed).trees" logEvery="500" mode="tree">
+            <log idref="SciPhyTree" printMetaData="true"/>
         </logger>
 
 

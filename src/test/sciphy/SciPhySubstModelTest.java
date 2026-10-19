@@ -1,12 +1,12 @@
 package sciphy;
 
 import beast.base.core.Description;
-import beast.base.inference.parameter.RealParameter;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
-import beast.base.evolution.substitutionmodel.Frequencies;
+import beast.base.spec.evolution.substitutionmodel.Frequencies;
+import beast.base.spec.inference.parameter.SimplexParam;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
-import org.apache.commons.math.distribution.PoissonDistributionImpl;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class SciPhySubstModelTest {
     @Test (expected = RuntimeException.class)
     public void testExceptionForNegEditFreqInput(){
 
-        RealParameter editprobs = new RealParameter("-1 2");
+        SimplexParam editprobs = new SimplexParam(new double[]{-1,2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", editprobs, "estimate", false);
 
@@ -43,7 +43,7 @@ public class SciPhySubstModelTest {
     @Test (expected = RuntimeException.class)
     public void testExceptionForEditFreqSumNot1(){
 
-        RealParameter editprobs = new RealParameter("0.6 0.2");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.6,0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", editprobs, "estimate", false);
 
@@ -54,7 +54,7 @@ public class SciPhySubstModelTest {
     @Test (expected = RuntimeException.class)
     public void testExceptionForEmptyEditFreqInput(){
 
-        RealParameter editprobs = new RealParameter();
+        SimplexParam editprobs = new SimplexParam();
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", editprobs, "estimate", false);
 
@@ -68,9 +68,10 @@ public class SciPhySubstModelTest {
     public void testTransitionProbabilities(){
 
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
         int targetBClength = 5;
@@ -90,7 +91,7 @@ public class SciPhySubstModelTest {
         // expectedProbability : draw 1 event on a Poisson process bounded to 3
         // P(1)*0.2
 
-        org.apache.commons.math.distribution.PoissonDistribution dist = new PoissonDistributionImpl(0.5);
+        org.apache.commons.math3.distribution.PoissonDistribution dist = new PoissonDistribution(0.5);
         Double expectedProbability = dist.probability(1) * 0.2 ;
         Double calculatedProbability = substModel.getSequenceTransitionProbability( sequence_a, sequence_b,0.5,0.5,targetBClength);
 
@@ -104,8 +105,8 @@ public class SciPhySubstModelTest {
     @Test
     public void testTransitionProbabilitiesNoEdit(){
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
@@ -134,10 +135,9 @@ public class SciPhySubstModelTest {
     public void testTransitionProbabilitiesSingleEdit(){
 
         // Arrange
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
-
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
         int targetBClength = 5;
@@ -171,10 +171,9 @@ public class SciPhySubstModelTest {
     public void testTransitionProbabilities2Edits(){
 
         // Arrange
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
-
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
 
@@ -206,9 +205,9 @@ public class SciPhySubstModelTest {
     public void testTransitionProbabilitiesEditsAndSaturation(){
 
         // Arrange
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
 
@@ -241,8 +240,8 @@ public class SciPhySubstModelTest {
     public void test1ProbabilityForFullySaturated(){
 
         // Arrange
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
@@ -273,9 +272,9 @@ public class SciPhySubstModelTest {
     public void testTransitionProbabilitiesMissingData() {
 
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName("editProbabilities", editProbabilities, "frequencies", frequencies);
         int targetBClength = 5;
@@ -308,9 +307,9 @@ public class SciPhySubstModelTest {
     public void testTransitionProbabilitiesMissingMissingData() {
 
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
         Frequencies frequencies = new Frequencies();
-        RealParameter editProbabilities = new RealParameter("0.8 0.2");
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substModel.initByName("editProbabilities", editProbabilities, "frequencies", frequencies);
         int targetBClength = 5;
@@ -372,13 +371,13 @@ public class SciPhySubstModelTest {
 //    }
 
     //-----------------------------------------------------------------------------------//
-    // Validate that the PoissonDistributionImpl we use to calculate the poisson probabilities
+    // Validate that the PoissonDistribution we use to calculate the poisson probabilities
     // behaves as expected. We test this by comparing against the values by Rpois.
 
     @Test
     public void testPoissonDistAgainstR(){
 
-        org.apache.commons.math.distribution.PoissonDistribution dist = new PoissonDistributionImpl(0.5);
+        org.apache.commons.math3.distribution.PoissonDistribution dist = new PoissonDistribution(0.5);
         double p0 = dist.probability(0);
         assertEquals( 0.6065307, p0, 0.00001);
         double p1 = dist.probability(1);
@@ -391,7 +390,7 @@ public class SciPhySubstModelTest {
         assertEquals(  0.001579507, p4, 0.00001);
 
 
-         dist = new PoissonDistributionImpl(0.001);
+         dist = new PoissonDistribution(0.001);
          p0 = dist.probability(0);
         assertEquals( 0.9990005, p0, 0.00001);
          p1 = dist.probability(1);

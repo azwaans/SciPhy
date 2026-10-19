@@ -1,15 +1,18 @@
 package sciphy;
 
 import beast.base.core.Log;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
+import beast.base.spec.domain.Int;
+import beast.base.spec.domain.Real;
+import beast.base.spec.inference.parameter.IntScalarParam;
+import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
-import beast.base.evolution.branchratemodel.StrictClockModel;
-import beast.base.evolution.sitemodel.SiteModel;
-import beast.base.evolution.substitutionmodel.Frequencies;
+import beast.base.spec.evolution.branchratemodel.StrictClockModel;
+import beast.base.spec.evolution.sitemodel.SiteModel;
+import beast.base.spec.evolution.substitutionmodel.Frequencies;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
+import beast.base.spec.inference.parameter.SimplexParam;
 import sciphy.evolution.likelihood.SciPhyTreeLikelihood;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import org.junit.Before;
@@ -27,36 +30,35 @@ public class SciPhyLikelihoodTest {
     SciPhySubstitutionModel substModel;
     SiteModel siteM;
     StrictClockModel clockModel;
-    RealParameter origin;
-    IntegerParameter arraylength;
+    RealScalarParam origin;
+    IntScalarParam arraylength;
 
-    // TODO test for input of an empty arrayLength 
+    // TODO test for input of an empty arrayLength
 
     @Before
     public void setUp() {
 
         substModel = new SciPhySubstitutionModel();
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0.0 0.0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
 
         //site model
-
         siteM = new SiteModel();
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam<Real> meanRate = new RealScalarParam<>(0.5, Real.INSTANCE);
         clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
 
-        origin = new RealParameter("6");
-        arraylength = new IntegerParameter("5");
+        origin = new RealScalarParam<>(6.0, Real.INSTANCE);
+        arraylength = new IntScalarParam(5, Int.INSTANCE);
         sciphyLikelihood = new SciPhyTreeLikelihood();
 
     }
@@ -118,7 +120,7 @@ public class SciPhyLikelihoodTest {
 
 
         // this should fail
-        RealParameter originNegative = new RealParameter("-1");
+        RealScalarParam originNegative = new RealScalarParam( -1.0,Real.INSTANCE);
         sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", originNegative, "arrayLength", arraylength);
 
     }
@@ -139,7 +141,7 @@ public class SciPhyLikelihoodTest {
                 newick,
                 "adjustTipHeights", false, "offset", 0);
 
-        RealParameter originNegative = new RealParameter("4");
+        RealScalarParam originNegative = new RealScalarParam(4,Real.INSTANCE);
         // this should fail
         sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", originNegative, "arrayLength", arraylength);
         double LogPCalc = sciphyLikelihood.calculateLogP();
@@ -166,7 +168,7 @@ public class SciPhyLikelihoodTest {
 
 
         // this should fail
-        IntegerParameter arrayNegative = new IntegerParameter("-1");
+        IntScalarParam arrayNegative = new IntScalarParam( -1, Int.INSTANCE);
         sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayNegative);
 
     }
@@ -190,7 +192,7 @@ public class SciPhyLikelihoodTest {
 
 
         // this should fail
-        IntegerParameter arrayTooLarge = new IntegerParameter("6");
+        IntScalarParam arrayTooLarge = new IntScalarParam( 6,Int.INSTANCE);
 
         sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayTooLarge);
 
@@ -240,15 +242,15 @@ public class SciPhyLikelihoodTest {
         tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
                 newick,
                 "adjustTipHeights", false, "offset", 0);
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0.0 0.0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.1");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.1,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);        //site model
@@ -291,15 +293,15 @@ public class SciPhyLikelihoodTest {
         tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
                 newick,
                 "adjustTipHeights", false, "offset", 0);
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0.0 0.0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.0");
-        RealParameter missProbability = new RealParameter("0.1");
+        RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.1,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);        //site model
@@ -340,15 +342,15 @@ public class SciPhyLikelihoodTest {
         tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
                 newick,
                 "adjustTipHeights", false, "offset", 0);
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0.0 0.0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.1");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 0.1,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);        //site model
@@ -469,8 +471,8 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);        //site model
@@ -478,10 +480,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -529,15 +531,15 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.1");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam(0.1, Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);        //site model
@@ -545,10 +547,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -602,21 +604,21 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-        RealParameter missRate = new RealParameter("1.0");
-        RealParameter missProb = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.0,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);        //site model
         SiteModel siteM = new SiteModel();
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5.0");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -666,21 +668,21 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProb = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingProbability",missProb,"missingRate",missRate);        //site model
         SiteModel siteM = new SiteModel();
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -733,8 +735,8 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -744,10 +746,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -809,8 +811,8 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -820,10 +822,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -883,8 +885,8 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -894,10 +896,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -959,8 +961,8 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 0 0");
-        RealParameter editprobs = new RealParameter("1.0 0 0 0");
+        SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -970,10 +972,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -1037,8 +1039,8 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter editprobs = new RealParameter("0.5 0.5");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.5, 0.5});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -1048,10 +1050,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -1125,12 +1127,12 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter editprobs = new RealParameter("0.5 0.5");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.5, 0.5});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-        RealParameter missProb = new RealParameter("0.0");
-        RealParameter missRate = new RealParameter("0.5");
+        RealScalarParam missProb = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model
@@ -1138,10 +1140,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -1205,12 +1207,12 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter editprobs = new RealParameter("0.5 0.5");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.5, 0.5});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-        RealParameter missProb = new RealParameter("0.0");
-        RealParameter missRate = new RealParameter("0.5");
+        RealScalarParam missProb = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model
@@ -1218,10 +1220,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -1285,12 +1287,12 @@ public class SciPhyLikelihoodTest {
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
 
-        RealParameter editprobs = new RealParameter("0.5 0.5");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam(new double[]{0.5, 0.5});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-        RealParameter missProb = new RealParameter("0.0");
-        RealParameter missRate = new RealParameter("0.5");
+        RealScalarParam missProb = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model
@@ -1298,10 +1300,10 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
@@ -1362,8 +1364,8 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -1374,11 +1376,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
      
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1435,14 +1437,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1454,11 +1456,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("2");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 2.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1498,14 +1500,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("1.0");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1517,11 +1519,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("3");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 3.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1563,14 +1565,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("1.0");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1582,11 +1584,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("3");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 3.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1628,14 +1630,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("1.0");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1647,11 +1649,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("3");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 3.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1694,14 +1696,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("1.0");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1713,11 +1715,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("3");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 3.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1759,14 +1761,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{0.5, 0.5});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1778,11 +1780,11 @@ public class SciPhyLikelihoodTest {
 
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("1.0");
+        RealScalarParam meanRate = new RealScalarParam( 1.0,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("2");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 2.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1835,14 +1837,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1851,11 +1853,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -1935,14 +1937,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.0");
-        RealParameter missProbability = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1951,11 +1953,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2021,14 +2023,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.0");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2037,11 +2039,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2119,14 +2121,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProbability = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2135,11 +2137,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2225,14 +2227,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.0");
-        RealParameter missProbability = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2241,11 +2243,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2317,14 +2319,14 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         //missingness parameters
-        RealParameter missRate = new RealParameter("0.0");
-        RealParameter missProbability = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2333,11 +2335,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2435,8 +2437,8 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
-        RealParameter editprobs = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -2446,11 +2448,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -2516,13 +2518,13 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
-        RealParameter editprobs = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProb = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model
@@ -2531,11 +2533,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arraylength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -2620,8 +2622,8 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
-        RealParameter editprobs = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -2631,11 +2633,11 @@ public class SciPhyLikelihoodTest {
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2695,24 +2697,25 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
-        RealParameter editprobs = new RealParameter("0.8 0.2");
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProb = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
+        Log.info.println("Insert probabilties" + substitutionModel.getInsertProbabilities());
 
         //site model
         SiteModel siteM = new SiteModel();
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("6");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 6.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2771,21 +2774,22 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
+        Log.info.println("Insert probabilties" + substitutionModel.getInsertProbabilities());
         //site model
         SiteModel siteM = new SiteModel();
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("4");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 4.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2849,25 +2853,25 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
 
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProb = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
         //site model
         SiteModel siteM = new SiteModel();
         siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 
         //likelihood class
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("4");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 4.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -2959,13 +2963,13 @@ public class SciPhyLikelihoodTest {
 //
 //        //create a sub model with values
 //        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-//        RealParameter editprobs = new RealParameter("0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.88");
-//        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+//        RealScalarParam editprobs = new RealScalarParam( "0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.88");
+//        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
 //        Frequencies frequencies = new Frequencies();
 //        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 //        //missingness parameters
-//        RealParameter missRate = new RealParameter("0.0");
-//        RealParameter missProbability = new RealParameter("0.5");
+//        RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
+//        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
 //
 //        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
 //                "missingRate",missRate,"missingProbability",missProbability);        //site model
@@ -2973,11 +2977,11 @@ public class SciPhyLikelihoodTest {
 //        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
 //
 //        //likelihood class
-//        RealParameter meanRate = new RealParameter("0.5");
+//        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
 //        StrictClockModel clockModel = new StrictClockModel();
 //        clockModel.initByName("clock.rate", meanRate);
-//        RealParameter origin = new RealParameter("10");
-//        IntegerParameter arrayLength = new IntegerParameter("5");
+//        RealScalarParam origin = new RealScalarParam( "10");
+//        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 //
 //        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 //
@@ -3043,8 +3047,8 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -3055,11 +3059,11 @@ public class SciPhyLikelihoodTest {
 
         //likelihood class
 
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("4");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 4.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -3120,12 +3124,12 @@ public class SciPhyLikelihoodTest {
 
         //create a sub model with values
         SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        RealParameter editprobs = new RealParameter("0.8 0.2");
-        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-        RealParameter missRate = new RealParameter("0.5");
-        RealParameter missProb = new RealParameter("0.5");
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model
@@ -3134,11 +3138,11 @@ public class SciPhyLikelihoodTest {
 
         //likelihood class
 
-        RealParameter meanRate = new RealParameter("0.5");
+        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
-        RealParameter origin = new RealParameter("4");
-        IntegerParameter arrayLength = new IntegerParameter("5");
+        RealScalarParam origin = new RealScalarParam( 4.0,Real.INSTANCE);
+        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 
@@ -3252,8 +3256,8 @@ public class SciPhyLikelihoodTest {
 //
 //        //create a sub model with values
 //        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-//        RealParameter editprobs = new RealParameter("0.8 0.2");
-//        RealParameter stateFrequencies = new RealParameter("1.0 0 0");
+//        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
+//        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
 //        Frequencies frequencies = new Frequencies();
 //        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 //        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
@@ -3264,11 +3268,11 @@ public class SciPhyLikelihoodTest {
 //
 //        //likelihood class
 //
-//        RealParameter meanRate = new RealParameter("0.5");
+//        RealScalarParam meanRate = new RealScalarParam( 0.5,Real.INSTANCE);
 //        StrictClockModel clockModel = new StrictClockModel();
 //        clockModel.initByName("clock.rate", meanRate);
-//        RealParameter origin = new RealParameter("4");
-//        IntegerParameter arrayLength = new IntegerParameter("5");
+//        RealScalarParam origin = new RealScalarParam( 4.0,Real.INSTANCE);
+//        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 //
 //        likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayLength);
 //

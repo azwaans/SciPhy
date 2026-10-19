@@ -4,24 +4,15 @@ package sciphy.evolution.likelihood;
 import beast.base.core.Description;
 import beast.base.core.Input;
 import beast.base.core.Input.Validate;
-import beast.base.core.Log;
-import beast.base.evolution.branchratemodel.BranchRateModel;
-import beast.base.evolution.branchratemodel.StrictClockModel;
-import beast.base.evolution.likelihood.GenericTreeLikelihood;
-import beast.base.evolution.sitemodel.SiteModel;
-import beast.base.evolution.substitutionmodel.SubstitutionModel;
+import beast.base.spec.evolution.likelihood.GenericTreeLikelihood;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeInterface;
 import beast.base.inference.State;
-import beast.base.inference.parameter.IntegerParameter;
-import beast.base.inference.parameter.RealParameter;
-import org.apache.commons.math.distribution.PoissonDistributionImpl;
-import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
+import beast.base.spec.type.IntScalar;
+import beast.base.spec.type.RealScalar;
 
 import java.util.*;
-
-import static sciphy.util.LogSum.logSum;
 
 @Description("tree likelihood for a SciPhy alignment given a generic SiteModel, " +
         "a beast tree and a branch rate model. This is a version of the SciPhy likelihood using caching without a likelihoodCore implementation ")
@@ -29,8 +20,8 @@ import static sciphy.util.LogSum.logSum;
 public class SciPhyParsimony extends GenericTreeLikelihood {
 
 
-    final public Input<IntegerParameter> arrayLengthInput = new Input<>("arrayLength", "Number of positions in the target BC", Validate.REQUIRED);
-    final public Input<RealParameter> originTimeInput = new Input<>("origin", "Duration of the experiment");
+    final public Input<IntScalar> arrayLengthInput = new Input<>("arrayLength", "Number of positions in the target BC", Validate.REQUIRED);
+    final public Input<RealScalar> originTimeInput = new Input<>("origin", "Duration of the experiment");
 
 
     protected int nodeCount;
@@ -66,7 +57,7 @@ public class SciPhyParsimony extends GenericTreeLikelihood {
     @Override
     public void initAndValidate() {
 
-        arrayLength = arrayLengthInput.get().getValue();
+        arrayLength = arrayLengthInput.get().get();
         if (arrayLength < 1 || (dataInput.get().getSiteCount() != arrayLength)) {
             throw new IllegalArgumentException(String.format(
                     "Invalid array length: Ensure that length >= 1 and matches alignment "));
@@ -79,7 +70,7 @@ public class SciPhyParsimony extends GenericTreeLikelihood {
 
         originTime = 0.0;
         if (originTimeInput.get() != null) {
-            originTime = originTimeInput.get().getValue();
+            originTime = originTimeInput.get().get();
             if (originTime < 0.0) {
                 throw new IllegalArgumentException(String.format(
                         "Invalid origin time input: ensure that origin>0"));
