@@ -14,18 +14,18 @@
 
 
     <!-- barcode array length -->
-    <parameter id="arrayLength" spec="parameter.RealIntParam" domain="NonNegativeInt" name="stateNode">5</parameter>
+    <IntScalarParam id="arrayLength" spec="parameter.IntScalarParam" domain="NonNegativeInt" name="stateNode">5</IntScalarParam>
 
     <!-- edit probabilities -->
-    <parameter id="editProbs" spec="SimplexParam" name="stateNode"
+    <SimplexParam id="editProbs" spec="SimplexParam" name="stateNode"
     >0.0277809923086177 0.163266590406445 0.157689134044409 0.0858551823497424 0.14881849550613 0.110415770354848 0.0976965453320326 0.0422864837731308 0.0212393168228608 0.0279922754158425 0.042595134236652 0.0562839070853184 0.0180801723639712
-    </parameter>
+    </SimplexParam>
 
     <!-- clock rate -->
-    <parameter id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.1</parameter>
+    <RealScalarParam id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.1</RealScalarParam>
 
     <!-- length of simulation -->
-    <parameter id="origin" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">25</parameter>
+    <RealScalarParam id="origin" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">25</RealScalarParam>
 
     <!-- tree input provided as a newick text-->
     <stateNode spec='beast.base.evolution.tree.TreeParser' id='simulatedTree' IsLabelledNewick='true' adjustTipHeights='false'

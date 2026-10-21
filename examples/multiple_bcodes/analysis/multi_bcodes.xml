@@ -6087,29 +6087,29 @@
             </stateNode>
             
             <!-- editing model parameters -->
-            <parameter id="editProbs" spec="SimplexParam"
+            <SimplexParam id="editProbs" spec="SimplexParam"
                        name="stateNode" dimension="19"
             >0.05263157894736842
-            </parameter>
+            </SimplexParam>
 
-            <parameter id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.2</parameter>
+            <RealScalarParam id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.2</RealScalarParam>
 
 
             <!-- population process parameters -->
-            <parameter id="netGrowthRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.5</parameter>
-            <parameter id="turnoverRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.4</parameter>
+            <RealScalarParam id="netGrowthRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.5</RealScalarParam>
+            <RealScalarParam id="turnoverRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.4</RealScalarParam>
             
 
             <!--fix origin to experiment duration, e.g. 25 -->
             <!-- fixed origin -->
-            <parameter id="origin" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">25</parameter>
+            <RealScalarParam id="origin" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">25</RealScalarParam>
 
 
             <!-- fix sampling proportion to truth -->
-            <parameter id="samplingProportion" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.0004</parameter>
+            <RealScalarParam id="samplingProportion" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.0004</RealScalarParam>
 
 
-            <parameter id="freqParameter" spec="SimplexParam"  name="stateNode" >0.25 0.25 0.25 0.25</parameter>
+            <SimplexParam id="freqParameter" spec="SimplexParam"  name="stateNode" >0.25 0.25 0.25 0.25</SimplexParam>
 
         </state>
 
@@ -6148,14 +6148,14 @@
                 <!-- Alignment 1 -->
                 <distribution id="treeLikelihood.1" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@data_ATGGTAAG" tree="@SciPhyTree" origin="@origin" useScaling="true" >
                     <siteModel id="siteModel" spec="beast.base.spec.evolution.sitemodel.SiteModel">
-                        <parameter id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</parameter>
+                        <RealScalarParam id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</RealScalarParam>
                         <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs">
                             <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
                                 <frequencies id="frequencies" spec="parameter.SimplexParam" estimate="false" > 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
                             </frequencies>
                         </substModel>
                     </siteModel>
-                    <parameter id="arrayLength5" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">5</parameter>
+                    <IntScalarParam id="arrayLength5" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">5</IntScalarParam>
                     <branchRateModel id="strictClock" spec="beast.base.spec.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate"/>
                     <!-- Alignment 2 -->
                 </distribution>
@@ -6178,7 +6178,7 @@
                 </distribution>
                 <!-- Alignment 8 -->
                 <distribution id="treeLikelihood.8" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TGGACGAC" tree="@SciPhyTree" origin="@origin" useScaling="true">
-                    <parameter id="arrayLength4" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">4</parameter>
+                    <IntScalarParam id="arrayLength4" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">4</IntScalarParam>
                 </distribution>
                 <!-- Alignment 9 -->
                 <distribution id="treeLikelihood.9" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" siteModel="@siteModel" branchRateModel="@strictClock" data="@data_TGGTTTTG" tree="@SciPhyTree" origin="@origin" useScaling="true" arrayLength="@arrayLength4">
