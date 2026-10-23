@@ -2,6 +2,7 @@ open module sciphy {
     requires beast.pkgmgmt;
     requires beast.base;
     requires feast;
+    requires beast.fx;
     requires commons.math3;
 
     exports sciphy.evolution.datatype;
@@ -10,6 +11,7 @@ open module sciphy {
     exports sciphy.evolution.substitutionmodel;
     exports sciphy.evolution.tree;
     exports sciphy.util;
+    exports sciphy.app.beauti;
 
     provides beast.base.core.BEASTInterface with
             sciphy.evolution.datatype.SciPhyData,

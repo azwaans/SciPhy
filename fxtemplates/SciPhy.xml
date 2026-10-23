@@ -173,13 +173,6 @@
             taxa="@$(n)" scarringHeight="20" rootHeight="23"
                        scarringDuration="5" sequencesAreClustered="false"/>
 
-<!--            <plugin spec='sciphy.evolution.tree.startingTree' id='StartingTree.t:$(n)' estimate='false' taxonset='@TaxonSet.$(n)' initial='@Tree.t:$(n)'-->
-<!--                       taxa="@$(n)" scarringHeight="20" rootHeight="23"-->
-<!--                       scarringDuration="5" sequencesAreClustered="false">-->
-
-<!--            </plugin>-->
-
-
 
             <plugin id='TreeHeight.t:$(n)' spec='beast.base.evolution.tree.TreeStatLogger' logHeight='true' tree='@Tree.t:$(n)'/>
             <plugin id='TreeLength.t:$(n)' spec='beast.base.evolution.tree.TreeStatLogger' logLength='true' tree='@Tree.t:$(n)'/>
@@ -195,17 +188,14 @@
 				<data spec="beast.base.evolution.alignment.Alignment" id='$(n)'>
 					<userDataType spec='beast.base.evolution.datatype.IntegerData' id='integerDataType.$(n)' />
 				</data>
-				<IntScalarParam id="arrayLength" spec="beast.base.spec.inference.parameter.IntScalarParam" estimate="false" name="arrayLength">5</IntScalarParam>
+				<IntScalarParam id="arrayLength.$(n)" spec="beast.base.spec.inference.parameter.IntScalarParam" estimate="false" name="arrayLength">5</IntScalarParam>
 				<siteModel spec='beast.base.spec.evolution.sitemodel.SiteModel' id="SiteModel.s:$(n)" gammaCategoryCount='0'>
 						<proportionInvariant spec='beast.base.spec.inference.parameter.RealScalarParam' domain='NonNegativeReal' id='proportionInvariant.s:$(n)' value='0.0' estimate='false'/>
 				        <mutationRate        spec='beast.base.spec.inference.parameter.RealScalarParam' domain='NonNegativeReal' id='mutationRate.s:$(n)' value='1.0' estimate='false'/>
 				        <shape               spec='beast.base.spec.inference.parameter.RealScalarParam' domain='NonNegativeReal' id='gammaShape.s:$(n)' value='1.0' estimate='false'/>
                     <!-- SciPhy subst model -->
 					<substModel spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" id="SciPhySubstmodel.s:$(n)">
-					    <SimplexParam spec="beast.base.spec.inference.parameter.SimplexParam" id="editProbabilities.s:$(n)"  name="editProbabilities" value="
-					    0.1 0.1 0.1 0.1 0.1
-					    0.1 0.1 0.1 0.1 0.025
-					    0.025 0.025 0.025"
+					    <SimplexParam spec="beast.base.spec.inference.parameter.SimplexParam" id="editProbabilities.s:$(n)"  name="editProbabilities" value="1.0"
 					    estimate="true"/>
 					    <RealScalarParam spec="beast.base.spec.inference.parameter.RealScalarParam" domain='NonNegativeReal' id="lossRate.s:$(n)" name="missingRate" value="1.0" estimate='true'/>
 					    <RealScalarParam spec="beast.base.spec.inference.parameter.RealScalarParam" id="lossProbability.s:$(n)" name="missingProbability" value="0.5" estimate='true'/>
@@ -222,15 +212,13 @@
 			</distribution>
 
             <!-- default tree prior -->
-            <plugin spec='beast.base.spec.evolution.speciation.YuleModel' id="YuleModel.t:$(n)" tree='@Tree.t:$(n)'>
+            <plugin spec='beast.base.spec.evolution.speciation.YuleModel' id="YuleModel.t:$(n)" tree='@Tree.t:$(n)' originHeight="@experimentLength.$(n)">
                 <RealScalarParam spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" name='birthDiffRate' id="birthRate.t:$(n)" value='1.0' estimate='true'/>
             </plugin>
 
             <distribution spec="beast.base.spec.inference.distribution.Dirichlet" id='EditProbabilitiesPrior.s:$(n)' param='@editProbabilities.s:$(n)'>
                 <RealVectorParam spec="beast.base.spec.inference.parameter.RealVectorParam" domain="PositiveReal" id="alpha.s:$(n)" name="alpha" value="
-                1.5 1.5 1.5 1.5 1.5
-                1.5 1.5 1.5 1.5 1.5
-                1.5 1.5 1.5" />
+                1.5" />
             </distribution>
 
             <distribution spec="beast.base.spec.inference.distribution.Uniform" id='ClockPrior.c:$(n)' param='@clockRate.c:$(n)' lower='0' upper='100'/>
@@ -254,7 +242,7 @@
 
             <operator id='YuleModelTreeScaler.t:$(n)' spec='beast.base.spec.evolution.operator.ScaleTreeOperator' scaleFactor="0.5" weight="3" tree="@Tree.t:$(n)"/>
             <operator id='YuleModelTreeRootScaler.t:$(n)' spec='beast.base.spec.evolution.operator.ScaleTreeOperator' scaleFactor="0.5" weight="3" tree="@Tree.t:$(n)" rootOnly='true'/>
-<!--            <operator id='YuleModelUniformOperator.t:$(n)' spec='beast.base.spec.inference.distribution.Uniform' weight="30" tree="@Tree.t:$(n)"/>-->
+            <operator id='YuleModelUniformOperator.t:$(n)' spec='beast.base.evolution.operator.Uniform' weight="30" tree="@Tree.t:$(n)"/>
             <operator id='YuleModelbeast.BactrianSubtreeSlide.t:$(n)' spec='beast.base.evolution.operator.kernel.BactrianSubtreeSlide' weight="15" size="1.0" tree="@Tree.t:$(n)"/>
             <operator id='YuleModelNarrow.t:$(n)' spec='Exchange' isNarrow='true' weight="15" tree="@Tree.t:$(n)"/>
             <operator id='YuleModelWide.t:$(n)' spec='Exchange' isNarrow='false' weight="3" tree="@Tree.t:$(n)"/>
@@ -270,6 +258,7 @@
             </upDownOperator>
 
 ]]>
+            <connect method="sciphy.app.beauti.SciPhyConnector.customConnector"/>
             <connect srcID='SciPhyTreeLikelihood.$(n)'         targetID='likelihood' inputName='distribution' if="isInitializing"/>
             <connect srcID='YuleModel.t:$(n)'               targetID='prior' inputName='distribution' if="isInitializing"/>
             <connect method="beastfx.app.inputeditor.SiteModelInputEditor.customConnector"/>
@@ -288,7 +277,8 @@
             <connect srcID='gammaShape.s:$(n)'                targetID='state' inputName='stateNode' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'/>
             <connect srcID='clockRate.c:$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'/>
             <connect srcID='birthRate.t:$(n)'                 targetID='state' inputName='stateNode' if='inposterior(YuleModel.t:$(n)) and inposterior(Tree.t:$(n)) and birthRate.t:$(n)/estimate=true'/>
-            <connect srcID='experimentLength.$(n)'                    targetID='state' inputName='stateNode' if='inlikelihood(experimentLength.$(n)) and experimentLength.$(n)/estimate=true'/>
+            <connect srcID='experimentLength.$(n)'            targetID='state' inputName='stateNode' if='inlikelihood(experimentLength.$(n))'/>
+            <connect srcID='arrayLength.$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(arrayLength.$(n))'/>
 
             <connect srcID='editProbabilitiesScaler.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'>Changes the edit probabilities for partition s:$(n)</connect>
             <connect srcID='mutationRateScaler.s:$(n)'        targetID='mcmc' inputName='operator' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'>Scales mutation rate of partition s:$(n)</connect>

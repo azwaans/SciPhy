@@ -31,7 +31,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
     final public Input<RealScalar> originTimeInput = new Input<>("origin", "Duration of the experiment");
 
-    final public Input<IntScalar> arrayLengthInput = new Input<>("arrayLength", "Number of positions in the target BC", Validate.REQUIRED);
+    final public Input<IntScalar> arrayLengthInput = new Input<>("arrayLength", "Number of positions in the target BC");
 
     final public Input<Boolean> useScalingInput = new Input<Boolean>("useScaling", "Whether or not to scale the log likelihood", false,
             Validate.OPTIONAL);
@@ -86,7 +86,19 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
 
     @Override
     public void initAndValidate() {
-        arrayLength = arrayLengthInput.get().get();
+
+
+        if(arrayLengthInput.get() != null) {
+            arrayLength = arrayLengthInput.get().get();
+        } else {
+            arrayLength = dataInput.get().getSiteCount();
+        }
+
+        if (arrayLength < 1 ) {
+            throw new IllegalArgumentException(String.format(
+                    "Invalid array length: Ensure that length >= 1 "));
+        }
+
         missingState = new ArrayList<>();
         lostState = new ArrayList<>();
         uneditedState = new ArrayList<>();
@@ -96,10 +108,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
             uneditedState.add(0);
         }
 
-        if (arrayLength < 1 || (dataInput.get().getSiteCount() != arrayLength)) {
-            throw new IllegalArgumentException(String.format(
-                    "Invalid array length: Ensure that length >= 1 and matches alignment "));
-        }
         nodeCount = treeInput.get().getNodeCount();
         if (nodeCount <= 2) {
             throw new IllegalArgumentException(String.format(
