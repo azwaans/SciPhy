@@ -6208,7 +6208,7 @@
         <operator spec="beast.base.spec.evolution.operator.ScaleTreeOperator" tree="@SciPhyTree" weight="10.0"/>
 
         <operator spec="WilsonBalding" tree="@SciPhyTree" weight="10.0"/>
-        <operator spec="beast.base.spec.inference.distribution.Uniform" tree="@SciPhyTree"
+        <operator spec="beast.base.evolution.operator.Uniform" tree="@SciPhyTree"
                   weight="10.0"/>
 
         <operator spec="Exchange"

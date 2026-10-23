@@ -122,7 +122,7 @@
                     <IntScalarParam id="arrayLength" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">5</IntScalarParam>
                     <IntScalarParam id="origin" spec="parameter.RealScalarParam" estimate="false" name="origin">60</IntScalarParam>
                     <siteModel id="SiteModel" spec="beast.base.spec.evolution.sitemodel.SiteModel">
-                        <IntScalarParam id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</IntScalarParam>
+                        <RealScalarParam id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</RealScalarParam>
                         <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs">
                             <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
                                 <frequencies id="frequencies" spec="parameter.SimplexParam" estimate="false" > 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
