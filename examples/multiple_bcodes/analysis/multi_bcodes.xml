@@ -6080,8 +6080,8 @@
 
             <!--starting tree -->
             <stateNode id="SciPhyTree" spec="sciphy.evolution.tree.startingTree" rootHeight="20"
-                       taxa="@data_ATGGTAAG" scarringHeight="20"
-                       scarringDuration="5" sequencesAreClustered="false">
+                       taxa="@data_ATGGTAAG" editHeight="20"
+                       editDuration="5" sequencesAreClustered="false">
                 <trait idref="dateTrait.t:alignment"/>
                 <taxonset idref="TaxonSet.0"/>
             </stateNode>

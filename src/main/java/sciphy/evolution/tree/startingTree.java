@@ -7,6 +7,8 @@ import beast.base.inference.StateNodeInitialiser;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.type.RealScalar;
 import beast.base.util.Randomizer;
 
 import java.util.List;
@@ -15,13 +17,14 @@ import java.util.stream.IntStream;
 /**
  * @author Sophie Seidel
  */
-@Description("This class generates a valid starting tree given an alignment and information on the scarring experiment.")
+@Description("This class generates a valid starting tree given an alignment and information on the editing experiment.")
 public class startingTree extends Tree implements StateNodeInitialiser {
     final public Input<Alignment> taxaInput = new Input<>("taxa", "set of taxa to initialise tree specified by alignment", Input.Validate.REQUIRED);
-
-    final public Input<Double> rootHeightInput = new Input<>("rootHeight", "Time from beginning of the experiment until sequencing", Input.Validate.REQUIRED);
-    final public Input<Double> scarringDurationInput = new Input<>("scarringDuration", "Time duration from scarring start to scarring stop", Input.Validate.REQUIRED);
-    final public Input<Double> scarringHeightInput = new Input<>("scarringHeight", "Time from the onset of scarring until sequencing", Input.Validate.REQUIRED);
+    final public Input<RealScalar<PositiveReal>> originHeightInput = new Input<>("originHeight", "Time from beginning of the experiment until sequencing", Input.Validate.OPTIONAL);
+    final public Input<RealScalar<PositiveReal>> stemLengthInput = new Input<>("stemLength", "Time from beginning of the experiment until the first branching event in the tree (first division)", Input.Validate.OPTIONAL);
+    final public Input<RealScalar<PositiveReal>> editDurationInput = new Input<>("editDuration", "Time duration from edit start to edit stop", Input.Validate.REQUIRED);
+    final public Input<RealScalar<PositiveReal>> editHeightInput = new Input<>("editHeight", "Time from the onset of edit until sequencing", Input.Validate.REQUIRED);
+    final public Input<RealScalar<PositiveReal>> rootHeightInput = new Input<>("rootHeight", "Time from first branching event (cell division) until sequencing", Input.Validate.OPTIONAL);
     final public Input<Boolean> sequencesAreClusteredInput = new Input<>("sequencesAreClustered", "Is true, if identical sequences appear in clusters within the alignment", true, Input.Validate.REQUIRED);
     final public Input<Integer> nClustersInput =  new Input<>("nClusters", "Number of clusters, where each cluster consists of identical sequences. " +
             "This input is only used when sequences are clustered.");
@@ -30,9 +33,12 @@ public class startingTree extends Tree implements StateNodeInitialiser {
     int[][] matchMatrix; // matrix indicating if taxa have identical sequences
     int[] taxaInTree; // vector indicating if taxa have (1) or have not (0) already been included in the tree
     int nClusters; // cluster is a set of identical sequences
-    double scarringHeight;
-    double scarringDuration;
+    double editHeight;
+    double editDuration;
     double rootHeight;
+    double originHeight;
+    double stemLength;
+
     int nTaxa;
     Alignment taxa;
     boolean sequencesAreClustered;
@@ -48,12 +54,48 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         nTaxa = taxanames.size();
         iIntNode = nTaxa;
 
-        rootHeight = rootHeightInput.get();
-        scarringDuration = scarringDurationInput.get();
-        scarringHeight = scarringHeightInput.get();
+        boolean hasOrigin = originHeightInput.get() != null;
+        boolean hasRoot = rootHeightInput.get() != null;
 
-        if (scarringHeight > rootHeight){
-            throw new RuntimeException("ScarringHeight has to be smaller or equal than rootHeight");
+        // Ensure at least one height input is supplied
+        if (!hasOrigin && !hasRoot) {
+            throw new IllegalArgumentException("Either 'originHeight' or 'rootHeight' must be provided in startingTree.");
+        }
+
+        // Derive rootHeight based on supplied inputs
+        if (hasOrigin) {
+            originHeight = originHeightInput.get().get();
+
+            if (stemLengthInput.get() != null) {
+                stemLength = stemLengthInput.get().get();
+            } else {
+                stemLength = 0.1; // Default stem buffer
+            }
+
+            rootHeight = originHeight - stemLength;
+
+            // If rootHeight is also explicitly provided, validate consistency
+            if (hasRoot) {
+                double explicitRoot = rootHeightInput.get().get();
+                if (Math.abs(explicitRoot - rootHeight) > 1e-5) {
+                    // Optional: override with explicit rootHeight or throw error
+                    rootHeight = explicitRoot;
+                }
+            }
+        } else {
+            // rootHeight is supplied directly
+            rootHeight = rootHeightInput.get().get();
+            if (stemLengthInput.get() != null) {
+                stemLength = stemLengthInput.get().get();
+                originHeight = rootHeight + stemLength;
+            }
+        }
+
+        editDuration = editDurationInput.get().get();
+        editHeight = editHeightInput.get().get();
+
+        if (editHeight > rootHeight){
+            throw new RuntimeException("editHeight has to be smaller or equal than rootHeight");
         }
 
         // number of clusters is only known a priory if sequences are clustered in the alignment
@@ -77,7 +119,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
     @Override
     public void initStateNodes() {
 
-        root = get_tree(rootHeight, scarringHeight, taxa, nClusters, matchMatrix);
+        root = get_tree(rootHeight, editHeight, taxa, nClusters, matchMatrix);
 
         leafNodeCount = nTaxa;
         nodeCount = leafNodeCount *2 -1 ;
@@ -212,7 +254,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
             //set up parent node
             Node parent = new Node();
-            // space internal nodes at unequal intervals until scarringHeight
+            // space internal nodes at unequal intervals until editHeight
             double height = divTimes * (iMatch+1) - Randomizer.uniform(0.01, 0.09);
             parent.setHeight(height);// * Randomizer.nextDouble());
             parent.setNr(iIntNode);
@@ -273,13 +315,13 @@ public class startingTree extends Tree implements StateNodeInitialiser {
      * included in the tree we use the variable taxaInTree.
      *
      * @param rootHeight
-     * @param scarringHeight
+     * @param editHeight
      * @param taxa
      * @param nClusters
      * @param matchMatrix
      * @return starting tree
      */
-    public Node get_tree(double rootHeight, double scarringHeight, Alignment taxa, int nClusters, int[][] matchMatrix){
+    public Node get_tree(double rootHeight, double editHeight, Alignment taxa, int nClusters, int[][] matchMatrix){
 
         if(nTaxa == 1){
             int onlyTaxon = 0;
@@ -305,9 +347,9 @@ public class startingTree extends Tree implements StateNodeInitialiser {
         int iCluster = 0;
 
         // time between the internal nodes connecting the cluster trees
-        double divTime = (rootHeight - scarringHeight) / nClusters;
+        double divTime = (rootHeight - editHeight) / nClusters;
 
-        double scarringStop = scarringHeight - scarringDuration;
+        double scarringStop = editHeight - editDuration;
         // get left subtree
         Node subtreeLeft = get_cluster_tree(iTaxon, scarringStop, taxa, iCluster);
 
@@ -328,7 +370,7 @@ public class startingTree extends Tree implements StateNodeInitialiser {
 
             // get parent
             Node parent = new Node();
-            parent.setHeight(scarringHeight + iCluster * divTime);
+            parent.setHeight(editHeight + iCluster * divTime);
             // Number of nodes in the final tree - number of nodes that have yet to be created
             parent.setNr(iIntNode);
             parent.addChild(subtreeLeft);
