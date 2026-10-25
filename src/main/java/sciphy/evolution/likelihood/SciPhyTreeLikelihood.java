@@ -94,7 +94,7 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
             arrayLength = dataInput.get().getSiteCount();
         }
 
-        if (arrayLength < 1 ) {
+        if (arrayLength < 1 || arrayLength != dataInput.get().getSiteCount()) {
             throw new IllegalArgumentException(String.format(
                     "Invalid array length: Ensure that length >= 1 "));
         }

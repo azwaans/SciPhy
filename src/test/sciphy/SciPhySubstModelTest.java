@@ -3,13 +3,18 @@ package sciphy;
 import beast.base.core.Description;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
+import beast.base.spec.domain.Real;
 import beast.base.spec.evolution.substitutionmodel.Frequencies;
+import beast.base.spec.inference.parameter.RealScalarParam;
+import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.spec.inference.parameter.SimplexParam;
+import org.junit.rules.ExpectedException;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -279,6 +284,12 @@ public class SciPhySubstModelTest {
         substModel.initByName("editProbabilities", editProbabilities, "frequencies", frequencies);
         int targetBClength = 5;
 
+        substModel.missingState = new ArrayList<>();
+        substModel.lostState = new ArrayList<>();
+        for (int i = 0; i < targetBClength; i++) {
+            substModel.missingState.add(-1);
+            substModel.lostState.add(-2);
+        }
 
         Sequence a = new Sequence("cell1", "1,2,0,0,0");
         Sequence b = new Sequence("cell2", "?,?,?,?,?");
@@ -339,36 +350,36 @@ public class SciPhySubstModelTest {
     }
 
 
-        // TODO test this elsewhere: the test below fails, but is irrelevant assuming that only correct sequences of states will ever be proposed, as tested in LikelihoodTests
-//    @Test
-//    public void test0ProbabilityForForbiddenTransition(){
-//
-//        RealParameter stateFrequencies = new RealParameter("1.0 0 0 ");
-//        Frequencies frequencies = new Frequencies();
-//        RealParameter editProbabilities = new RealParameter("0.8 0.2");
-//
-//        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-//        substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
-//
-//        int targetBClength = 5;
-//
-//        Sequence a = new Sequence("cell1", "2,0,0,0,0");
-//        Sequence b = new Sequence("cell2", "1,2,0,0,0");
-//
-//        Alignment alignment = new Alignment();
-//        alignment.initByName("sequence", a, "dataType", "integer");
-//        alignment.initByName("sequence", b, "dataType", "integer");
-//
-//        //internal representation of the sequences for the package:
-//        List<Integer> sequence_a = alignment.getCounts().get(0);
-//        List<Integer> sequence_b = alignment.getCounts().get(1);
-//
-//        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a, sequence_b,0.5,0.5, targetBClength);
-//
-//        Double expectedProbability = 0.0;
-//
-//        assertEquals(expectedProbability, calculatedProbability, 1-10);
-//    }
+
+    @Test(expected = RuntimeException.class)
+    public void test0ProbabilityForForbiddenTransition(){
+
+        RealVectorParam stateFrequencies = new RealVectorParam(new double[]{1.0, 0, 0}, Real.INSTANCE);
+        Frequencies frequencies = new Frequencies();
+        SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
+
+        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
+        substModel.initByName( "editProbabilities", editProbabilities, "frequencies" ,frequencies);
+
+        int targetBClength = 5;
+
+        Sequence a = new Sequence("cell1", "2,0,0,0,0");
+        Sequence b = new Sequence("cell2", "1,2,0,0,0");
+
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "dataType", "integer");
+        alignment.initByName("sequence", b, "dataType", "integer");
+
+        //internal representation of the sequences for the package:
+        List<Integer> sequence_a = alignment.getCounts().get(0);
+        List<Integer> sequence_b = alignment.getCounts().get(1);
+
+        Double calculatedProbability = substModel.getSequenceTransitionProbability(sequence_a, sequence_b,0.5,0.5, targetBClength);
+
+        Double expectedProbability = 0.0;
+
+        assertEquals(expectedProbability, calculatedProbability, 1-10);
+    }
 
     //-----------------------------------------------------------------------------------//
     // Validate that the PoissonDistribution we use to calculate the poisson probabilities

@@ -1,4 +1,4 @@
-package sciphy;
+package java.sciphy;
 
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.datatype.DataType;

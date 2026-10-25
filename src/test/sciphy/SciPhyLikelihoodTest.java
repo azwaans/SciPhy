@@ -32,24 +32,26 @@ public class SciPhyLikelihoodTest {
     StrictClockModel clockModel;
     RealScalarParam origin;
     IntScalarParam arraylength;
+    Tree dummyTree;
+    Alignment dummyAlignment;
 
     // TODO test for input of an empty arrayLength
 
     @Before
     public void setUp() {
 
-        substModel = new SciPhySubstitutionModel();
-        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
+
+         substModel = new SciPhySubstitutionModel();
         SimplexParam editprobs = new SimplexParam(new double[]{0.8,0.2});
         SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
-        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
+        substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
 
         //site model
         siteM = new SiteModel();
-        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substModel);
 
 
         //likelihood class
@@ -60,6 +62,17 @@ public class SciPhyLikelihoodTest {
         origin = new RealScalarParam<>(6.0, Real.INSTANCE);
         arraylength = new IntScalarParam(5, Int.INSTANCE);
         sciphyLikelihood = new SciPhyTreeLikelihood();
+
+        String newick = "(CHILD1:5,CHILD2:5)";
+        Sequence a = new Sequence("CHILD1", "1,2,0,0,0");
+        Sequence b = new Sequence("CHILD2", "1,2,0,0,0");
+        dummyAlignment = new Alignment();
+        dummyAlignment.initByName("sequence", a, "dataType", "integer");
+        dummyAlignment.initByName("sequence", b, "dataType", "integer");
+        dummyTree = new TreeParser();
+        dummyTree.initByName("IsLabelledNewick", true, "taxa", dummyAlignment, "newick",
+                newick,
+                "adjustTipHeights", false, "offset", 0);
 
     }
 
@@ -173,7 +186,6 @@ public class SciPhyLikelihoodTest {
 
     }
 
-    //TODO maybe automatically set the array length based on input data?
     @Test(expected = RuntimeException.class)
     public void testExceptionForMismatchedTargetLengthInput() {
         String newick = "(CHILD1:5,CHILD2:5)";
@@ -232,177 +244,19 @@ public class SciPhyLikelihoodTest {
     }
 
     @Test
-    public void testGetPossibleAncestorsSetsBothMissingProcesses() {
-        String newick = "(CHILD1:5,CHILD2:5)";
-        Sequence b = new Sequence("CHILD2", "1,2,0,0,0");
-        Sequence a = new Sequence("CHILD1", "?,?,?,?,?");
-        Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"sequence",b, "dataType", "integer");
-        Tree tree = new TreeParser();
-        tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
-                newick,
-                "adjustTipHeights", false, "offset", 0);
-        SimplexParam editprobs = new SimplexParam(new double[]{0.8,0.2});
-        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
-        Frequencies frequencies = new Frequencies();
-        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-
-        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        //missingness parameters
-        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.1,Real.INSTANCE);
-
-        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
-                "missingRate",missRate,"missingProbability",missProbability);        //site model
-        SiteModel siteM = new SiteModel();
-        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+    public void testGetPossibleAncestorsMissingStateNoMissingProcess() {
 
 
-
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
-
-
-
-        //internal representation of the sequences for the package:
-        List<Integer> sequence_a = alignment.getCounts().get(0);
-
-        //ancestral sequences
-        List<List<Integer>> ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
-
-        //manually create ancestral states
-        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
-        List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
-
-        // For a sequence with n sites, there are n_edited_sites + 1 ancestral sequences (all edited position + fully unedited))
-        assertEquals(ancs_sequence_a.size(), 2, 1e-5);
-        //for any sequence, its possible ancestral sequences are itself + removing edits 1 by 1 + unedited
-
-        assertTrue(ancs_sequence_a.contains(alleleLost));
-        assertTrue(ancs_sequence_a.contains(alleleWC));
-
-    }
-
-    @Test
-    public void testGetPossibleAncestorsSetsOnlyDropout() {
-        String newick = "(CHILD1:5,CHILD2:5)";
-        Sequence b = new Sequence("CHILD2", "1,2,0,0,0");
-        Sequence a = new Sequence("CHILD1", "?,?,?,?,?");
-        Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"sequence",b, "dataType", "integer");
-        Tree tree = new TreeParser();
-        tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
-                newick,
-                "adjustTipHeights", false, "offset", 0);
-        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
-        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
-        Frequencies frequencies = new Frequencies();
-        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-
-        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.1,Real.INSTANCE);
-
-        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
-                "missingRate",missRate,"missingProbability",missProbability);        //site model
-        SiteModel siteM = new SiteModel();
-        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
-
-
-
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
-
-
-
-        //internal representation of the sequences for the package:
-        List<Integer> sequence_a = alignment.getCounts().get(0);
-
-        //ancestral sequences
-        List<List<Integer>> ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
-
-        //manually create ancestral states
-        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
-
-        // For a sequence with n sites, there are n_edited_sites + 1 ancestral sequences (all edited position + fully unedited))
-        assertEquals(ancs_sequence_a.size(), 1, 1e-5);
-        //for any sequence, its possible ancestral sequences are itself + removing edits 1 by 1 + unedited
-
-        assertTrue(ancs_sequence_a.contains(alleleWC));
-
-    }
-
-    @Test
-    public void testGetPossibleAncestorsSetsOnlyLoss() {
-        String newick = "(CHILD1:5,CHILD2:5)";
-        Sequence b = new Sequence("CHILD2", "1,2,0,0,0");
-        Sequence a = new Sequence("CHILD1", "?,?,?,?,?");
-        Alignment alignment = new Alignment();
-        alignment.initByName("sequence", a,"sequence",b, "dataType", "integer");
-        Tree tree = new TreeParser();
-        tree.initByName("IsLabelledNewick", true, "taxa", alignment, "newick",
-                newick,
-                "adjustTipHeights", false, "offset", 0);
-        SimplexParam editprobs = new SimplexParam( new double[] {0.8,0.2});
-        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0.0, 0.0});
-        Frequencies frequencies = new Frequencies();
-        frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
-
-        SciPhySubstitutionModel substitutionModel = new SciPhySubstitutionModel();
-        //missingness parameters
-        RealScalarParam missRate = new RealScalarParam( 0.1,Real.INSTANCE);
         RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
 
-        substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
-                "missingRate",missRate,"missingProbability",missProbability);        //site model
+        substModel.initByName("missingRate",missRate,"missingProbability",missProbability);
         SiteModel siteM = new SiteModel();
-        siteM.initByName("gammaCategoryCount", 0, "substModel", substitutionModel);
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substModel);
+        sciphyLikelihood.initByName("data", dummyAlignment, "tree", dummyTree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
 
-
-
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
-
-
-
-        //internal representation of the sequences for the package:
-        List<Integer> sequence_a = alignment.getCounts().get(0);
-
-        //ancestral sequences
-        List<List<Integer>> ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
-
-        //manually create ancestral states
-        List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
-
-        // For a sequence with n sites, there are n_edited_sites + 1 ancestral sequences (all edited position + fully unedited))
-        assertEquals(ancs_sequence_a.size(), 1, 1e-5);
-        //for any sequence, its possible ancestral sequences are itself + removing edits 1 by 1 + unedited
-
-        assertTrue(ancs_sequence_a.contains(alleleLost));
-
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testGetPossibleAncestorsMissingState() {
-        //dummy tree and alignment
-        String newick = "(CHILD1:5,CHILD2:5)";
-        Sequence b = new Sequence("CHILD1", "1,2,0,0,0");
-        Sequence c = new Sequence("CHILD2", "1,2,0,0,0");
-
-        Alignment alignmentDummy = new Alignment();
-        alignmentDummy.initByName("sequence", b, "dataType", "integer");
-        alignmentDummy.initByName("sequence", c, "dataType", "integer");
-        //this won't be used for this test
-
-        Tree tree = new TreeParser();
-        tree.initByName("IsLabelledNewick", true, "taxa", alignmentDummy, "newick",
-                newick,
-                "adjustTipHeights", false, "offset", 0);
-
-        sciphyLikelihood.initByName("data", alignmentDummy, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
-
-
-
+        //create alignment with missing sequences
         Sequence a = new Sequence("cell1", "?,?,?,?,?");
-
 
         Alignment alignment = new Alignment();
         alignment.initByName("sequence", a, "dataType", "integer");
@@ -411,22 +265,130 @@ public class SciPhyLikelihoodTest {
         List<Integer> sequence_a = alignment.getCounts().get(0);
 
         //ancestral sequences
-        List<List<Integer>> ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
+        List<List<Integer>> ancs_sequence_a;
+        ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
+
+        //manually create ancestral states
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
+        // For a missing sequence the ancestor is the WildCard allele state
+        //this is slightly an ege case because you wouyldn't input missing data while specifying missRate AND missProb=0.0
+        assertEquals(1, ancs_sequence_a.size(), 1e-5);
+        assertTrue(ancs_sequence_a.contains(alleleWC));
+
+        //todo: check that the likelihood is -inf/NaN in this setup
+
+
+    }
+
+    @Test
+    public void testGetPossibleAncestorsSetsBothMissingProcesses() {
+
+        //missingness parameters
+        RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.1,Real.INSTANCE);
+
+        substModel.initByName("missingRate",missRate,"missingProbability",missProbability);
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substModel);
+        sciphyLikelihood.initByName("data", dummyAlignment, "tree", dummyTree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+        //create alignment with missing sequences
+        Sequence a = new Sequence("cell1", "?,?,?,?,?");
+
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "dataType", "integer");
+
+        //internal representation of the sequences for the package:
+        List<Integer> sequence_a = alignment.getCounts().get(0);
+
+        //ancestral sequences
+        List<List<Integer>> ancs_sequence_a;
+        ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
 
         //manually create ancestral states
         List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
 
-        // For a sequence with n sites, there are n_edited_sites + 1 ancestral sequences (all edited position + fully unedited))
-        assertEquals(ancs_sequence_a.size(), 2, 1e-5);
-        //for any sequence, its possible ancestral sequences are itself + removing edits 1 by 1 + unedited
+        // For a missing sequence the ancestor is the WildCard allele state or the lost state when lossRate != 0.0
+        assertEquals( 2, ancs_sequence_a.size(),1e-5);
 
-        assertTrue(ancs_sequence_a.contains(alleleWC));
         assertTrue(ancs_sequence_a.contains(alleleLost));
-
-
+        assertTrue(ancs_sequence_a.contains(alleleWC));
 
     }
+
+    @Test
+    public void testGetPossibleAncestorsSetsOnlyDropout() {
+        //missingness parameters
+        RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.1,Real.INSTANCE);
+
+        substModel.initByName("missingRate",missRate,"missingProbability",missProbability);
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substModel);
+        sciphyLikelihood.initByName("data", dummyAlignment, "tree", dummyTree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+        //create alignment with missing sequences
+        Sequence a = new Sequence("cell1", "?,?,?,?,?");
+
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "dataType", "integer");
+
+        //internal representation of the sequences for the package:
+        List<Integer> sequence_a = alignment.getCounts().get(0);
+
+        //ancestral sequences
+        List<List<Integer>> ancs_sequence_a;
+        ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
+
+        //manually create ancestral states
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
+        // For a missing sequence the ancestor is the WildCard when MissRate = 0.0 and MissProb != 0.0
+        assertEquals(1, ancs_sequence_a.size(),1e-5);
+
+        assertTrue(ancs_sequence_a.contains(alleleWC));
+
+    }
+
+    @Test
+    public void testGetPossibleAncestorsSetsOnlyLoss() {
+        //missingness parameters
+        RealScalarParam missRate = new RealScalarParam( 0.1,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+
+        substModel.initByName("missingRate",missRate,"missingProbability",missProbability);
+        SiteModel siteM = new SiteModel();
+        siteM.initByName("gammaCategoryCount", 0, "substModel", substModel);
+        sciphyLikelihood.initByName("data", dummyAlignment, "tree", dummyTree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+
+        //create alignment with missing sequences
+        Sequence a = new Sequence("cell1", "?,?,?,?,?");
+
+        Alignment alignment = new Alignment();
+        alignment.initByName("sequence", a, "dataType", "integer");
+
+        //internal representation of the sequences for the package:
+        List<Integer> sequence_a = alignment.getCounts().get(0);
+
+        //ancestral sequences
+        List<List<Integer>> ancs_sequence_a;
+        ancs_sequence_a = sciphyLikelihood.getPossibleAncestors(sequence_a);
+
+        //manually create ancestral states
+        List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
+        // For a missing sequence the ancestor is the LostState and the WildCard when MissRate != 0.0 and MissProb = 0.0
+        assertEquals( 2, ancs_sequence_a.size(), 1e-5);
+
+        assertTrue(ancs_sequence_a.contains(alleleLost));
+        assertTrue(ancs_sequence_a.contains(alleleWC));
+
+    }
+
+
 
     @Test
     public void testGetPossibleAncestorsSetsUnedited() {
@@ -555,7 +517,7 @@ public class SciPhyLikelihoodTest {
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "arrayLength", arrayLength);
 
         likelihood.partialLikelihoods = new double[2][tree1.getNodeCount()][];
-//
+
 //        //test ancestral states sets calculations
         likelihood.calculateLogP();
         Hashtable<Integer, List<List<Integer>>> statesDictionary = likelihood.ancestralStates;
@@ -630,12 +592,15 @@ public class SciPhyLikelihoodTest {
         //manually create states:
         List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, 0);
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
 
         assertEquals(3, statesDictionary.size());
 
         //1st leaf
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleWC));
 
 
         //2nd leaf
@@ -1155,13 +1120,17 @@ public class SciPhyLikelihoodTest {
 
         //Manually create states
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
         List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, -0);
 
 
         //check the ancestral dictionaries
         //todo find a way to extract node numbers in a way that we know their position in the tree
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleWC));
+
 
         //2nd leaf
         assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(1)).size(), 1);
@@ -1235,25 +1204,33 @@ public class SciPhyLikelihoodTest {
 
         //Manually create states
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
         List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, -0);
 
 
         //check the ancestral dictionaries
         //todo find a way to extract node numbers in a way that we know their position in the tree
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleWC));
+
 
         //2nd leaf
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(1)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(1)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(1)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(1)).contains(alleleWC));
+
 
         // node c
         assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(2)).size(), 1);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(2)).contains(allele0));
 
         //internal node between a and b
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(3)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(3)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(3)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(3)).contains(alleleWC));
+
 
         //root node a/b/c
         assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(4)).size(), 1);
@@ -1315,29 +1292,38 @@ public class SciPhyLikelihoodTest {
 
         //Manually create states
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
         List<Integer> allele0 = Arrays.asList(0, 0, 0, 0, -0);
 
 
         //check the ancestral dictionaries
         //todo find a way to extract node numbers in a way that we know their position in the tree
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(0)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(0)).contains(alleleWC));
 
         //2nd leaf
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(1)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(1)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(1)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(1)).contains(alleleWC));
 
         // node c
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(2)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(2)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(2)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(1)).contains(alleleWC));
 
         //internal node between a and b
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(3)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(3)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(3)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(3)).contains(alleleWC));
+
 
         //root node a/b/c
-        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(4)).size(), 1);
+        assertEquals(statesDictionary.get(likelihood.makeCachingIndexStates(4)).size(), 2);
         assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(4)).contains(alleleLost));
+        assertTrue(statesDictionary.get(likelihood.makeCachingIndexStates(4)).contains(alleleWC));
+
 
 
     }
@@ -1666,8 +1652,8 @@ public class SciPhyLikelihoodTest {
 
         double LogPCalc = likelihood.calculateLogP();
 
-        //log(((dpois(0,1)*exp(-1))*(dpois(0,1)*exp(-1))*(dpois(0,1)*exp(-1))*((1-exp(-2)))*dpois(0,1)*exp(-1)
-        double calculatedOnR = -0.4586751;
+        //log(exp(-1) * ((exp(-1) * ((1-exp(-1))^2) + (1-exp(-1))) * (1-exp(-2))) + (1-exp(-1)))
+        double calculatedOnR = -0.1278884;
         assertEquals(LogPCalc, calculatedOnR,0.00001);
 
 
@@ -1784,7 +1770,6 @@ public class SciPhyLikelihoodTest {
         StrictClockModel clockModel = new StrictClockModel();
         clockModel.initByName("clock.rate", meanRate);
         RealScalarParam origin = new RealScalarParam( 2.0,Real.INSTANCE);
-        IntScalarParam arrayLength = new IntScalarParam( 5,Int.INSTANCE);
 
 
         likelihood.initByName("data", alignment, "tree", tree1, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
@@ -1796,17 +1781,48 @@ public class SciPhyLikelihoodTest {
 
 
         double LogPCalc = likelihood.calculateLogP();
-        double calculatedOnR = -0.9327521;
+        // log((((1-exp(-0.5))^2) * exp(-0.5))  + (1- exp(-0.5)))
+        double calculatedOnR = -0.7187291;
 
 
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
         List<Integer> allele00 = Arrays.asList(0, 0, 0, 0, 0);
 
-        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbability(allele00, alleleLost, 1,1, 5) ;
-        assertEquals(Math.log(partial00000Internal1), calculatedOnR,0.00001);
+        // (1-exp(-0.5))^2
+        double calculatedOnRWCInternal1 = 0.1548181;
+        double partialWCInternal1 = (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1,1.0, 5)) * (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleWC, alleleWC, 1,1.0, 5)) ;
+        assertEquals(partialWCInternal1, calculatedOnRWCInternal1,0.00001);
 
+        //1.0
+        double partialLostInternal1 = (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1,1.0, 5)) * (substitutionModel.getSequenceTransitionProbabilityTipEdge(alleleLost, alleleWC, 1,1.0, 5)) ;
+        assertEquals(partialLostInternal1, 1.0,0.00001);
+
+       // exp(-0.5)
+        double roottoWC = substitutionModel.getSequenceTransitionProbability(allele00, alleleWC, 1,1.0, 5) ;
+        assertEquals(roottoWC, 0.6065306597,0.00001);
+
+
+        // 1 - exp(-0.5)
+        double roottoLost = substitutionModel.getSequenceTransitionProbability(allele00, alleleLost, 1,1.0, 5) ;
+        assertEquals(roottoLost, 0.3934693403,0.00001);
+
+        double L = Math.log(roottoWC * partialWCInternal1 + roottoLost * partialLostInternal1);
+        assertEquals(L, calculatedOnR,0.00001);
 
         assertEquals(LogPCalc, calculatedOnR,0.00001);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2058,17 +2074,20 @@ public class SciPhyLikelihoodTest {
         List<Integer> allele12 = Arrays.asList(1, 2, 0, 0, 0);
         List<Integer> allele1 = Arrays.asList(1, 0, 0, 0, 0);
         List<Integer> alleleLost = Arrays.asList(-2, -2, -2, -2, -2);
+        List<Integer> alleleWC = Arrays.asList(-1, -1, -1, -1, -1);
+
+
 
         double clockRate = 0.5;
 
         //internal1 is the node connecting Child1 and Child3
         double partial12000Internal1Left = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, allele12, 1 * clockRate, 1, 5);
-        double partial12000Internal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleLost, 1 * clockRate, 1, 5);
+        double partial12000Internal1Right = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele12, alleleWC, 1 * clockRate, 1, 5);
 
         double partial12000Internal1 = partial12000Internal1Left * partial12000Internal1Right;
 
-        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleLost, 1 * clockRate, 1, 5);
-        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleLost, 1 * clockRate, 1, 5);
+        double partial00000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele0, alleleWC, 1 * clockRate, 1, 5);
+        double partial10000Internal1 = substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, allele12, 1 * clockRate, 1, 5) * substitutionModel.getSequenceTransitionProbabilityTipEdge(allele1, alleleWC, 1 * clockRate, 1, 5);
 
         double partial00000Internal2 =  (substitutionModel.getSequenceTransitionProbability(allele0, allele12, 4 * clockRate,4, 5)* partial12000Internal1 +
                 substitutionModel.getSequenceTransitionProbability(allele0, allele1, 4 * clockRate,4, 5)* partial10000Internal1 +
