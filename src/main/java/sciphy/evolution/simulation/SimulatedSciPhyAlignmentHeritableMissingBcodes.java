@@ -110,14 +110,8 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
         }
 
         // creating the missing state, encoded as an array of -1.
-        //todo: make this flexible in array length
-        missingState = new int[] {
-            -1,
-            -1,
-            -1,
-            -1,
-            -1
-        };
+        missingState = new int[arrayLength];
+        Arrays.fill(missingState,-1);
 
         grabDataType();
 
