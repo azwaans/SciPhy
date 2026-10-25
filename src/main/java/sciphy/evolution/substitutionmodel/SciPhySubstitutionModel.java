@@ -10,6 +10,7 @@ import beast.base.evolution.datatype.IntegerData;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.substitutionmodel.EigenDecomposition;
 import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.domain.UnitInterval;
 import beast.base.spec.evolution.substitutionmodel.Base;
 import beast.base.evolution.tree.Node;
 import beast.base.spec.inference.parameter.RealScalarParam;
@@ -34,17 +35,17 @@ public class SciPhySubstitutionModel extends Base {
             "Rate at which the barcode goes missing heritably. Default 0.0.",
             new RealScalarParam(0.0, NonNegativeReal.INSTANCE));
 
-    final public Input<RealScalar<NonNegativeReal>>  missingProbInput = new Input<>(
+    final public Input<RealScalar<UnitInterval>>  missingProbInput = new Input<>(
             "missingProbability",
             "Probability that a barcode goes missing at the tips. Default 0.0",
-            new RealScalarParam(0.0, NonNegativeReal.INSTANCE));
+            new RealScalarParam(0.0, UnitInterval.INSTANCE));
 
     /**
      * edit insertion rate  *
      */
     protected Simplex editProbabilities;
     protected RealScalar<NonNegativeReal> missRate;
-    protected RealScalar<NonNegativeReal> missProbability;
+    protected RealScalar<UnitInterval> missProbability;
     double[] editProbs;
     double missingRate;
     double missingProbability;

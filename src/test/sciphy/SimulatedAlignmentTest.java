@@ -3,6 +3,7 @@ package java.sciphy;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.datatype.IntegerData;
+import beast.base.spec.domain.UnitInterval;
 import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.evolution.tree.Tree;
 import beast.base.evolution.tree.TreeParser;
@@ -163,7 +164,7 @@ public class SimulatedAlignmentTest {
                 "substModel", submodel, "mutationRate", mutationRate);
 
 
-        RealScalarParam missingProb = new RealScalarParam(0.5,Real.INSTANCE);
+        RealScalarParam missingProb = new RealScalarParam(0.5,UnitInterval.INSTANCE);
         RealScalarParam origin = new RealScalarParam(6.0,Real.INSTANCE);
 
         DataType integerData = new IntegerData();
@@ -223,7 +224,7 @@ public class SimulatedAlignmentTest {
 
 
         RealScalarParam missingRate = new RealScalarParam(0.03, Real.INSTANCE);
-        RealScalarParam missingProb = new RealScalarParam(0.5,Real.INSTANCE);
+        RealScalarParam missingProb = new RealScalarParam(0.5, UnitInterval.INSTANCE);
         RealScalarParam origin = new RealScalarParam(6.0,Real.INSTANCE);
 
         DataType integerData = new IntegerData();

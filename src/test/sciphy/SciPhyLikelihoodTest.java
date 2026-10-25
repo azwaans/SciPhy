@@ -3,6 +3,7 @@ package sciphy;
 import beast.base.core.Log;
 import beast.base.spec.domain.Int;
 import beast.base.spec.domain.Real;
+import beast.base.spec.domain.UnitInterval;
 import beast.base.spec.inference.parameter.IntScalarParam;
 import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.evolution.alignment.Alignment;
@@ -248,7 +249,7 @@ public class SciPhyLikelihoodTest {
 
 
         RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substModel.initByName("missingRate",missRate,"missingProbability",missProbability);
         SiteModel siteM = new SiteModel();
@@ -356,7 +357,7 @@ public class SciPhyLikelihoodTest {
     public void testGetPossibleAncestorsSetsOnlyLoss() {
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.1,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substModel.initByName("missingRate",missRate,"missingProbability",missProbability);
         SiteModel siteM = new SiteModel();
@@ -501,7 +502,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam(0.1, Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam(0.1, UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);        //site model
@@ -637,7 +638,7 @@ public class SciPhyLikelihoodTest {
         SimplexParam stateFrequencies = new SimplexParam( new double[]{1.0,0.0, 0.0, 0.0, 0.0});
         Frequencies frequencies = new Frequencies();
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,UnitInterval.INSTANCE);
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingProbability",missProb,"missingRate",missRate);        //site model
         SiteModel siteM = new SiteModel();
@@ -1430,7 +1431,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1493,7 +1494,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1558,7 +1559,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1623,7 +1624,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1689,7 +1690,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 1.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1754,7 +1755,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1860,7 +1861,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -1960,7 +1961,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2046,7 +2047,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.0,Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.0,UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2147,7 +2148,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2253,7 +2254,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2345,7 +2346,7 @@ public class SciPhyLikelihoodTest {
 
         //missingness parameters
         RealScalarParam missRate = new RealScalarParam( 0.0,Real.INSTANCE);
-        RealScalarParam missProbability = new RealScalarParam( 0.5, Real.INSTANCE);
+        RealScalarParam missProbability = new RealScalarParam( 0.5, UnitInterval.INSTANCE);
 
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,
                 "missingRate",missRate,"missingProbability",missProbability);
@@ -2543,7 +2544,7 @@ public class SciPhyLikelihoodTest {
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
 
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,UnitInterval.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model
@@ -2721,7 +2722,7 @@ public class SciPhyLikelihoodTest {
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,UnitInterval.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
         Log.info.println("Insert probabilties" + substitutionModel.getInsertProbabilities());
 
@@ -2879,7 +2880,7 @@ public class SciPhyLikelihoodTest {
 
 
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,UnitInterval.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
         //site model
         SiteModel siteM = new SiteModel();
@@ -3148,7 +3149,7 @@ public class SciPhyLikelihoodTest {
         Frequencies frequencies = new Frequencies();
         frequencies.initByName("frequencies", stateFrequencies, "estimate", false);
         RealScalarParam missRate = new RealScalarParam( 0.5,Real.INSTANCE);
-        RealScalarParam missProb = new RealScalarParam( 0.5,Real.INSTANCE);
+        RealScalarParam missProb = new RealScalarParam( 0.5,UnitInterval.INSTANCE);
         substitutionModel.initByName("editProbabilities", editprobs, "frequencies", frequencies,"missingRate",missRate,"missingProbability",missProb);
 
         //site model

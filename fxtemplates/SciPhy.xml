@@ -205,7 +205,7 @@
 					    <SimplexParam spec="beast.base.spec.inference.parameter.SimplexParam" id="editProbabilities.s:$(n)"  name="editProbabilities" value="1.0"
 					    estimate="true"/>
 					    <RealScalarParam spec="beast.base.spec.inference.parameter.RealScalarParam" domain='NonNegativeReal' id="lossRate.s:$(n)" name="missingRate" value="1.0" estimate='true'/>
-					    <RealScalarParam spec="beast.base.spec.inference.parameter.RealScalarParam" id="lossProbability.s:$(n)" name="missingProbability" value="0.5" estimate='true'/>
+					    <RealScalarParam spec="beast.base.spec.inference.parameter.RealScalarParam" domain='UnitInterval' id="lossProbability.s:$(n)" name="missingProbability" value="0.5" estimate='true'/>
                            <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
                                 <frequencies id="frequencies" spec="beast.base.spec.inference.parameter.SimplexParam" estimate="false" > 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0</frequencies>
                             </frequencies>

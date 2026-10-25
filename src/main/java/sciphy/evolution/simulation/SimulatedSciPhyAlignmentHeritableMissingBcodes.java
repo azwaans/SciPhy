@@ -9,6 +9,9 @@ import beast.base.evolution.alignment.TaxonSet;
 import beast.base.evolution.datatype.DataType;
 import beast.base.evolution.tree.Node;
 import beast.base.evolution.tree.Tree;
+import beast.base.spec.domain.NonNegativeReal;
+import beast.base.spec.domain.PositiveReal;
+import beast.base.spec.domain.UnitInterval;
 import beast.base.spec.evolution.sitemodel.SiteModel;
 import beast.base.spec.type.RealScalar;
 import beast.base.util.Randomizer;
@@ -39,28 +42,23 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
             "Site model to use in simulation.",
             Input.Validate.REQUIRED);
 
-    //TODO rename number of targets
-    public Input<Integer> nrOfTargetsInput = new Input<>(
-            "numberOfTargets",
-            "Number of targets to simulate.",
-            Input.Validate.REQUIRED);
 
     public Input<Integer> arrayLengthInput = new Input<>(
             "arrayLength",
             "Number of insertions to add per site",
             Input.Validate.REQUIRED);
 
-    public Input<RealScalar>  missingRateInput = new Input<>(
+    public Input<RealScalar<NonNegativeReal>>  missingRateInput = new Input<>(
             "missingRate",
             "Rate at which the barcode goes missing heritably (in reality a scaler from the clock rate)",
             Input.Validate.OPTIONAL);
 
-    public Input<RealScalar>  missingProbInput = new Input<>(
+    public Input<RealScalar<UnitInterval>>  missingProbInput = new Input<>(
             "missingProbability",
             "Probability that a barcode goes missing at the tips",
             Input.Validate.OPTIONAL);
 
-    public Input<RealScalar> originInput = new Input<>(
+    public Input<RealScalar<PositiveReal>> originInput = new Input<>(
             "origin", "Start of the process, usually the experiment",
             Input.Validate.OPTIONAL);
 
@@ -71,7 +69,6 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
 
     private Tree tree;
     private SiteModel siteModel;
-    private int numberOfTargets;
     private int arrayLength;
     private DataType dataType;
     private double originHeight;
@@ -92,7 +89,6 @@ public class SimulatedSciPhyAlignmentHeritableMissingBcodes extends Alignment {
         siteModel = siteModelInput.get();
         Log.info.println("category rates: " + Arrays.toString(siteModel.getCategoryRates(tree.getRoot())));
 
-        numberOfTargets = 1; //TODO rewrite for arbitrary #targets
         arrayLength = arrayLengthInput.get();
         sequences.clear();
 
