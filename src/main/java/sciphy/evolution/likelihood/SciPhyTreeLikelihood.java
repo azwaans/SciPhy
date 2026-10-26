@@ -187,7 +187,6 @@ public class SciPhyTreeLikelihood extends GenericTreeLikelihood {
     @Override
     public double calculateLogP() {
         final TreeInterface tree = treeInput.get();
-        this.hasDirt = Tree.IS_FILTHY;
 
         if(originTime != 0.0) {
             if (tree.getRoot().getHeight() >= originTime) {
