@@ -15,7 +15,6 @@ import beast.base.util.Randomizer;
 import beastfx.app.inputeditor.AlignmentImporter;
 import org.junit.Test;
 import sciphy.evolution.simulation.SimulatedSciPhyAlignment;
-import sciphy.evolution.simulation.SimulatedSciPhyAlignmentHeritableMissingBcodes;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import java.io.File;
 import static junit.framework.Assert.assertEquals;
@@ -56,7 +55,6 @@ public class SimulatedAlignmentTest {
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
                 "arrayLength", 100,
-                "numberOfTargets", 1,
                 "outputFileName", outputFileName,
                 "userDataType", integerData
         );
@@ -107,7 +105,7 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        SimulatedSciPhyAlignmentHeritableMissingBcodes simAlignment = new SimulatedSciPhyAlignmentHeritableMissingBcodes();
+        SimulatedSciPhyAlignment simAlignment = new SimulatedSciPhyAlignment();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
                 "arrayLength", 100,
@@ -163,7 +161,7 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        SimulatedSciPhyAlignmentHeritableMissingBcodes simAlignment = new SimulatedSciPhyAlignmentHeritableMissingBcodes();
+        SimulatedSciPhyAlignment simAlignment = new SimulatedSciPhyAlignment();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
                 "arrayLength", 100,
@@ -220,7 +218,7 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        SimulatedSciPhyAlignmentHeritableMissingBcodes simAlignment = new SimulatedSciPhyAlignmentHeritableMissingBcodes();
+        SimulatedSciPhyAlignment simAlignment = new SimulatedSciPhyAlignment();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
                 "arrayLength", 100,

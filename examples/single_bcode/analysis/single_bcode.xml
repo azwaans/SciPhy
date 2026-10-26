@@ -79,12 +79,19 @@
                 <taxonset idref="TaxonSet.0"/>
             </tree>
 
+            <!-- editing model parameters -->
             <SimplexParam id="editProbs" spec="SimplexParam"
                         name="stateNode" dimension="19"
                        >
                 0.05263157894736842
             </SimplexParam>
-             <RealScalarParam id="clockRate" spec="parameter.RealScalarParam" domain="PositiveReal" name="stateNode">1.0</RealScalarParam>
+            <RealScalarParam id="clockRate" spec="parameter.RealScalarParam" domain="PositiveReal" name="stateNode">1.0</RealScalarParam>
+
+            <!--this example assumes complete data, parameters of the loss model are set to 0.0-->
+            <RealScalarParam id="lossRate" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.0</RealScalarParam>
+            <RealScalarParam id="lossProbability" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" name="stateNode">0.0</RealScalarParam>
+
+            <!-- population process parameters -->
              <SimplexParam id="freqParameter" spec="SimplexParam"  name="stateNode" >0.25 0.25 0.25 0.25</SimplexParam>
              <RealScalarParam id="popsize" spec="parameter.RealScalarParam" domain="PositiveReal"  name="stateNode" >4000</RealScalarParam>
              <RealScalarParam id="growthRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode" >0.5599133</RealScalarParam>
@@ -118,12 +125,12 @@
 
             <!-- SciPhy tree likelihood -->
             <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution">
-                <distribution id="treeLikelihood.sciphyTest" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@sciphyTest" tree="@SciPhyTree" useScaling="true">
+                <distribution id="treeLikelihood.sciphyTest" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@sciphyTest" tree="@SciPhyTree" useScaling="true" >
                     <IntScalarParam id="arrayLength" spec="parameter.IntScalarParam" estimate="false" name="arrayLength">5</IntScalarParam>
                     <IntScalarParam id="origin" spec="parameter.RealScalarParam" estimate="false" name="origin">60</IntScalarParam>
                     <siteModel id="SiteModel" spec="beast.base.spec.evolution.sitemodel.SiteModel">
                         <RealScalarParam id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</RealScalarParam>
-                        <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs">
+                        <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs" missingRate="@lossRate" missingProbability="@lossProbability">
                             <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
                                 <frequencies id="frequencies" spec="parameter.SimplexParam" estimate="false" > 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
                             </frequencies>

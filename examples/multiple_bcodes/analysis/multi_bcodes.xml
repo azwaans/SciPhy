@@ -6094,6 +6094,10 @@
 
             <RealScalarParam id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.2</RealScalarParam>
 
+            <!--this example assumes complete data, parameters of the loss model are set to 0.0-->
+            <RealScalarParam id="lossRate" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.0</RealScalarParam>
+            <RealScalarParam id="lossProbability" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" name="stateNode">0.0</RealScalarParam>
+
 
             <!-- population process parameters -->
             <RealScalarParam id="netGrowthRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.5</RealScalarParam>
@@ -6146,10 +6150,10 @@
             <!-- SciPhy tree likelihood -->
             <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution">
                 <!-- Alignment 1 -->
-                <distribution id="treeLikelihood.1" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@data_ATGGTAAG" tree="@SciPhyTree" origin="@origin" useScaling="true" >
+                <distribution id="treeLikelihood.1" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" data="@data_ATGGTAAG" tree="@SciPhyTree" origin="@origin" useScaling="true">
                     <siteModel id="siteModel" spec="beast.base.spec.evolution.sitemodel.SiteModel">
                         <RealScalarParam id="mutationRate" spec="parameter.RealScalarParam" estimate="false" name="mutationRate">1.0</RealScalarParam>
-                        <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs">
+                        <substModel id="subsModel" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbs" missingRate="@lossRate" missingProbability="@lossProbability">
                             <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
                                 <frequencies id="frequencies" spec="parameter.SimplexParam" estimate="false" > 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
                             </frequencies>

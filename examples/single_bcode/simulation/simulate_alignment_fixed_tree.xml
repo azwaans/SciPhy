@@ -43,9 +43,9 @@
     <run spec="feast.simulation.GPSimulator" nSims="1">
 
         <!-- simulate sequence -->
-        <simulationObject id="seqAlign" spec="sciphy.evolution.simulation.SimulatedSciPhyAlignmentHeritableMissingBcodes"
+        <simulationObject id="seqAlign" spec="sciphy.evolution.simulation.SimulatedSciPhyAlignment"
                           outputFileName="./sciphy_data_seed=$(seed).clock=0.1.alignment.sciphy"
-                          numberOfTargets="1" arrayLength="5"
+                          arrayLength="5"
                           tree="@simulatedTree" origin="@origin" missingRate="@lossRate" missingProbability="@lossProbability">
 
             <userDataType spec="beast.base.evolution.datatype.IntegerData"/>
