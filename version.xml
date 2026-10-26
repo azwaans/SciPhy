@@ -7,7 +7,6 @@
         <provider classname="sciphy.evolution.datatype.SciPhyData"/>
     </service>
     <service type="beast.base.core.BEASTInterface">
-        <provider classname="sciphy.evolution.datatype.SciPhyData"/>
         <provider classname="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel"/>
         <provider classname="sciphy.evolution.tree.startingTree"/>
         <provider classname="sciphy.evolution.likelihood.SciPhyTreeLikelihood"/>

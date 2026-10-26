@@ -14,7 +14,6 @@ open module sciphy {
     exports sciphy.app.beauti;
 
     provides beast.base.core.BEASTInterface with
-            sciphy.evolution.datatype.SciPhyData,
             sciphy.evolution.likelihood.SciPhyParsimony,
             sciphy.evolution.likelihood.SciPhyTreeLikelihood,
             sciphy.evolution.simulation.SimulatedSciPhyAlignment,
