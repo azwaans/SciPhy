@@ -1,4 +1,4 @@
-package java.sciphy;
+package sciphy;
 
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.datatype.DataType;
@@ -17,19 +17,17 @@ import org.junit.Test;
 import sciphy.evolution.simulation.SimulatedSciPhyAlignment;
 import sciphy.evolution.simulation.SimulatedSciPhyAlignmentHeritableMissingBcodes;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
-
 import java.io.File;
-
 import static junit.framework.Assert.assertEquals;
+
 
 public class SimulatedAlignmentTest {
 
     // set up
     @Test
     public void testSimulationOnCherry() {
-
-        //Integer sequenceLength = 1;
-        String outputFileName = "src/test/sciphy/simAl.sciphy";
+        Randomizer.setSeed(2);
+        String outputFileName = "src/test/java/sciphy/simAl.sciphy";
         String newick = "((CHILD1:5,CHILD2:5)INTERNAL:1):0.0";
 
         Tree tree = new TreeParser();
@@ -54,11 +52,9 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        Randomizer.setSeed(2);
         SimulatedSciPhyAlignment simAlignment = new SimulatedSciPhyAlignment();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
-               // "sequenceLength", sequenceLength,
                 "arrayLength", 100,
                 "numberOfTargets", 1,
                 "outputFileName", outputFileName,
@@ -66,7 +62,7 @@ public class SimulatedAlignmentTest {
         );
 
         AlignmentImporter expectedAlignment = new sciphy.util.NexusImporter();
-        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/sciphy/expectedAlignment.sciphy")).get(0);
+        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/java/sciphy/expectedAlignment.sciphy")).get(0);
 
         assertEquals(alignment.getSequenceAsString("CHILD1"),
                 simAlignment.getSequenceAsString("CHILD1"));
@@ -77,10 +73,10 @@ public class SimulatedAlignmentTest {
     }
 
     @Test
-    public void testSimulationOnCherryHeritableMissingOnly() {
+    public void testSimulationOnCherryHeritableMissingDataOnly() {
+        Randomizer.setSeed(2);
 
-        //Integer sequenceLength = 1;
-        String outputFileName = "test/simAlWithHeritableMissingOnly.sciphy";
+        String outputFileName = "src/test/java/sciphy/simAlHeritableMissingData.sciphy";
         String newick = "(CHILD1:5,CHILD2:5):0.0";
 
         Tree tree = new TreeParser();
@@ -111,13 +107,10 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        Randomizer.setSeed(2);
         SimulatedSciPhyAlignmentHeritableMissingBcodes simAlignment = new SimulatedSciPhyAlignmentHeritableMissingBcodes();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
-               // "sequenceLength", sequenceLength,
                 "arrayLength", 100,
-                "numberOfTargets", 1,
                 "outputFileName", outputFileName,
                 "userDataType", integerData,
                 "missingRate",missingRate,
@@ -125,7 +118,7 @@ public class SimulatedAlignmentTest {
         );
 
         AlignmentImporter expectedAlignment = new sciphy.util.NexusImporter();
-        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/sciphy/expectedAlignmentMissingRates.sciphy")).get(0);
+        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/java/sciphy/expectedAlHeritableMissingData.sciphy")).get(0);
 
         assertEquals(alignment.getSequenceAsString("CHILD1"),
                 simAlignment.getSequenceAsString("CHILD1"));
@@ -136,10 +129,10 @@ public class SimulatedAlignmentTest {
     }
 
     @Test
-    public void testSimulationOnCherryTipMissingOnly() {
+    public void testSimulationOnCherryDropoutMissingDataOnly() {
+        Randomizer.setSeed(12345);
 
-        //Integer sequenceLength = 1;
-        String outputFileName = "src/test/sciphy/simAlWithTipMissingOnly.sciphy";
+        String outputFileName = "src/test/java/sciphy/simAlDropoutMissingData.sciphy";
         String newick = "(CHILD1:5,CHILD2:5):0.0";
 
         Tree tree = new TreeParser();
@@ -170,13 +163,10 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        Randomizer.setSeed(12345);
         SimulatedSciPhyAlignmentHeritableMissingBcodes simAlignment = new SimulatedSciPhyAlignmentHeritableMissingBcodes();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
-               // "sequenceLength", sequenceLength,
                 "arrayLength", 100,
-                "numberOfTargets", 1,
                 "outputFileName", outputFileName,
                 "userDataType", integerData,
                 "missingProbability",missingProb,
@@ -184,7 +174,7 @@ public class SimulatedAlignmentTest {
         );
 
         AlignmentImporter expectedAlignment = new sciphy.util.NexusImporter();
-        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/sciphy/expectedAlignmentMissingRates.sciphy")).get(0);
+        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/java/sciphy/expectedAlDropoutMissingData.sciphy")).get(0);
 
         assertEquals(alignment.getSequenceAsString("CHILD1"),
                 simAlignment.getSequenceAsString("CHILD1"));
@@ -195,10 +185,10 @@ public class SimulatedAlignmentTest {
     }
 
     @Test
-    public void testSimulationOnCherryBothMissingTypes() {
+    public void testSimulationOnCherryBothMissingDataTypes() {
+        Randomizer.setSeed(2);
 
-        //Integer sequenceLength = 1;
-        String outputFileName = "src/test/sciphy/simAlBothMissingTypes.sciphy";
+        String outputFileName = "src/test/java/sciphy/simAlBothMissingTypes.sciphy";
         String newick = "(CHILD1:5,CHILD2:5):0.0";
 
         Tree tree = new TreeParser();
@@ -230,13 +220,10 @@ public class SimulatedAlignmentTest {
         DataType integerData = new IntegerData();
 
         // simulate
-        Randomizer.setSeed(2);
         SimulatedSciPhyAlignmentHeritableMissingBcodes simAlignment = new SimulatedSciPhyAlignmentHeritableMissingBcodes();
         simAlignment.initByName("tree", tree,
                 "siteModel", siteM,
-                //"sequenceLength", sequenceLength,
                 "arrayLength", 100,
-                "numberOfTargets", 1,
                 "outputFileName", outputFileName,
                 "userDataType", integerData,
                 "missingProbability",missingProb,
@@ -245,7 +232,7 @@ public class SimulatedAlignmentTest {
         );
 
         AlignmentImporter expectedAlignment = new sciphy.util.NexusImporter();
-        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/sciphy/expectedAlignmentMissingRates.sciphy")).get(0);
+        beast.base.evolution.alignment.Alignment alignment = (Alignment) expectedAlignment.loadFile(new File("src/test/java/sciphy/expectedAlBothMissingTypes.sciphy")).get(0);
 
         assertEquals(alignment.getSequenceAsString("CHILD1"),
                 simAlignment.getSequenceAsString("CHILD1"));
