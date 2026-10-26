@@ -15,13 +15,14 @@ import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.inference.parameter.SimplexParam;
 import sciphy.evolution.likelihood.SciPhyParsimony;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SciPhyParsimonyTest {
 

@@ -16,14 +16,15 @@ import beast.base.evolution.tree.TreeParser;
 import beast.base.spec.inference.parameter.SimplexParam;
 import sciphy.evolution.likelihood.SciPhyTreeLikelihood;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SciPhyLikelihoodTest {
 
@@ -38,7 +39,7 @@ public class SciPhyLikelihoodTest {
 
     // TODO test for input of an empty arrayLength
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
 
@@ -77,7 +78,7 @@ public class SciPhyLikelihoodTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testExceptionForSingleBranchInput() {
 
         String newick = "(CHILD1:5)";
@@ -92,12 +93,15 @@ public class SciPhyLikelihoodTest {
                 "adjustTipHeights", false, "offset", 0);
 
         // this should fail
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+        assertThrows(RuntimeException.class, () -> {
+            sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+        });
+
     }
 
 
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testExceptionForSingleNodeInput() {
 
         String newick = "(CHILD1:0)";
@@ -113,10 +117,13 @@ public class SciPhyLikelihoodTest {
 
 
         // this should fail
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+        assertThrows(RuntimeException.class, () -> {
+            sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arraylength);
+        });
+
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testExceptionForOriginNegativeInput() {
         String newick = "(CHILD1:5,CHILD2:5)";
         Sequence a = new Sequence("CHILD1", "1,2,0,0,0");
@@ -135,7 +142,9 @@ public class SciPhyLikelihoodTest {
 
         // this should fail
         RealScalarParam originNegative = new RealScalarParam( -1.0,Real.INSTANCE);
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", originNegative, "arrayLength", arraylength);
+        assertThrows(RuntimeException.class, () -> {
+            sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", originNegative, "arrayLength", arraylength);
+        });
 
     }
 
@@ -164,7 +173,7 @@ public class SciPhyLikelihoodTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testExceptionForNegativeTargetLengthInput() {
         String newick = "(CHILD1:5,CHILD2:5)";
         Sequence a = new Sequence("CHILD1", "1,2,0,0,0");
@@ -183,11 +192,15 @@ public class SciPhyLikelihoodTest {
 
         // this should fail
         IntScalarParam arrayNegative = new IntScalarParam( -1, Int.INSTANCE);
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayNegative);
+
+        assertThrows(RuntimeException.class, () -> {
+            sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayNegative);
+        });
+
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testExceptionForMismatchedTargetLengthInput() {
         String newick = "(CHILD1:5,CHILD2:5)";
         Sequence a = new Sequence("CHILD1", "1,2,0,0,0");
@@ -207,8 +220,9 @@ public class SciPhyLikelihoodTest {
         // this should fail
         IntScalarParam arrayTooLarge = new IntScalarParam( 6,Int.INSTANCE);
 
-        sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayTooLarge);
-
+        assertThrows(RuntimeException.class, () -> {
+            sciphyLikelihood.initByName("data", alignment, "tree", tree, "siteModel", siteM, "branchRateModel", clockModel, "origin", origin, "arrayLength", arrayTooLarge);
+        });
     }
 
 

@@ -13,11 +13,14 @@ import beast.base.spec.inference.parameter.RealScalarParam;
 import beast.base.spec.inference.parameter.SimplexParam;
 import beast.base.util.Randomizer;
 import beastfx.app.inputeditor.AlignmentImporter;
-import org.junit.Test;
 import sciphy.evolution.simulation.SimulatedSciPhyAlignment;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
+
 import java.io.File;
-import static junit.framework.Assert.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class SimulatedAlignmentTest {

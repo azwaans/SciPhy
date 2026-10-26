@@ -3,69 +3,71 @@ package sciphy;
 import beast.base.core.Description;
 import beast.base.evolution.alignment.Alignment;
 import beast.base.evolution.alignment.Sequence;
-import beast.base.spec.domain.Real;
 import beast.base.spec.evolution.substitutionmodel.Frequencies;
-import beast.base.spec.inference.parameter.RealScalarParam;
-import beast.base.spec.inference.parameter.RealVectorParam;
 import beast.base.spec.inference.parameter.SimplexParam;
-import org.junit.rules.ExpectedException;
 import sciphy.evolution.substitutionmodel.SciPhySubstitutionModel;
 import org.apache.commons.math3.distribution.PoissonDistribution;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 
 @Description("Test substitution model")
 public class SciPhySubstModelTest {
 
     // test that inputs are handled as expected
+    //todo remove input checks that are now handled by the strong types themselvwes
 
     SciPhySubstitutionModel substModel;
 
-    @Before
+    @BeforeEach
     public void setUp(){
         substModel = new SciPhySubstitutionModel();
     }
 
     //----------------------------------------------------------------------------------//
     // test valid inputs
-    @Test (expected = RuntimeException.class)
+    @Test
     public void testExceptionForNegEditFreqInput(){
 
-        SimplexParam editprobs = new SimplexParam(new double[]{-1,2});
-        Frequencies frequencies = new Frequencies();
-        frequencies.initByName("frequencies", editprobs, "estimate", false);
+        assertThrows(IllegalArgumentException.class, () -> {
 
-        // this should fail
-        substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
+            SimplexParam editprobs = new SimplexParam(new double[]{-1,2});
+            Frequencies frequencies = new Frequencies();
+            frequencies.initByName("frequencies", editprobs, "estimate", false);
+            substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
+
+        });
+
     }
 
-    @Test (expected = RuntimeException.class)
+    @Test
     public void testExceptionForEditFreqSumNot1(){
 
-        SimplexParam editprobs = new SimplexParam(new double[]{0.6,0.2});
-        Frequencies frequencies = new Frequencies();
-        frequencies.initByName("frequencies", editprobs, "estimate", false);
-
-        // this should fail
-        substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
+        assertThrows(RuntimeException.class, () -> {
+            SimplexParam editprobs = new SimplexParam(new double[]{0.6,0.2});
+            Frequencies frequencies = new Frequencies();
+            frequencies.initByName("frequencies", editprobs, "estimate", false);
+            substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
+        });
     }
 
-    @Test (expected = RuntimeException.class)
+    @Test
     public void testExceptionForEmptyEditFreqInput(){
 
-        SimplexParam editprobs = new SimplexParam();
-        Frequencies frequencies = new Frequencies();
-        frequencies.initByName("frequencies", editprobs, "estimate", false);
+        assertThrows(RuntimeException.class, () -> {
+            SimplexParam editprobs = new SimplexParam();
+            Frequencies frequencies = new Frequencies();
+            frequencies.initByName("frequencies", editprobs, "estimate", false);
+            substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
 
-        // this should fail
-        substModel.initByName("editProbabilities", editprobs, "frequencies", frequencies);
-    }
+        });    }
 
     //----------------------------------------------------------------------------------//
     // test transition probability calculations
@@ -351,10 +353,10 @@ public class SciPhySubstModelTest {
 
 
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void test0ProbabilityForForbiddenTransition(){
 
-        RealVectorParam stateFrequencies = new RealVectorParam(new double[]{1.0, 0, 0}, Real.INSTANCE);
+        SimplexParam stateFrequencies = new SimplexParam(new double[]{1.0, 0, 0});
         Frequencies frequencies = new Frequencies();
         SimplexParam editProbabilities = new SimplexParam(new double[]{0.8, 0.2});
 
@@ -378,7 +380,10 @@ public class SciPhySubstModelTest {
 
         Double expectedProbability = 0.0;
 
-        assertEquals(expectedProbability, calculatedProbability, 1-10);
+        // this should fail
+        assertThrows(AssertionError.class, () -> {
+            assertEquals(expectedProbability, calculatedProbability, 1-10);
+        });
     }
 
     //-----------------------------------------------------------------------------------//

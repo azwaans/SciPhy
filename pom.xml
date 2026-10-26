@@ -122,7 +122,9 @@
                 <version>3.1.2</version>
                 <configuration>
                     <argLine>
-                        --add-reads io.github.azwaans=ALL-UNNAMED
+                        --add-reads sciphy=org.junit.jupiter.api
+                        --add-opens sciphy/sciphy=org.junit.platform.commons
+                        --add-reads sciphy=ALL-UNNAMED
                         --add-reads beast.base=ALL-UNNAMED
                         --add-reads beast.pkgmgmt=ALL-UNNAMED
                     </argLine>
