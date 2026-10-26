@@ -10,11 +10,9 @@
                  :beast.evolution.substitutionmodel
                  :beast.evolution.operators
                  :beast.math.distributions
+                 :beast.base.spec.inference.parameter
                  :feast.simulation">
 
-
-    <!-- barcode array length -->
-    <IntScalarParam id="arrayLength" spec="parameter.IntScalarParam" domain="NonNegativeInt" name="stateNode">5</IntScalarParam>
 
     <!-- edit probabilities -->
     <SimplexParam id="editProbs" spec="SimplexParam" name="stateNode"
@@ -22,10 +20,17 @@
     </SimplexParam>
 
     <!-- clock rate -->
-    <RealScalarParam id="clockRate" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.1</RealScalarParam>
+    <RealScalarParam id="clockRate" spec="RealScalarParam" domain="NonNegativeReal" name="stateNode">0.1</RealScalarParam>
+
+    <!-- heritable loss rate -->
+    <RealScalarParam id="lossRate" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">0.001</RealScalarParam>
+
+    <!-- heritable dropout loss probability -->
+    <RealScalarParam id="lossProbability" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" name="stateNode">0.2</RealScalarParam>
+
 
     <!-- length of simulation -->
-    <RealScalarParam id="origin" spec="parameter.RealScalarParam" domain="NonNegativeReal" name="stateNode">25</RealScalarParam>
+    <RealScalarParam id="origin" spec="RealScalarParam" domain="NonNegativeReal" name="stateNode">25</RealScalarParam>
 
     <!-- tree input provided as a newick text-->
     <stateNode spec='beast.base.evolution.tree.TreeParser' id='simulatedTree' IsLabelledNewick='true' adjustTipHeights='false'
@@ -38,10 +43,10 @@
     <run spec="feast.simulation.GPSimulator" nSims="1">
 
         <!-- simulate sequence -->
-        <simulationObject id="seqAlign" spec="sciphy.evolution.simulation.SimulatedSciPhyAlignment"
+        <simulationObject id="seqAlign" spec="sciphy.evolution.simulation.SimulatedSciPhyAlignmentHeritableMissingBcodes"
                           outputFileName="./sciphy_data_seed=$(seed).clock=0.1.alignment.sciphy"
-                          numberOfTargets="1" arrayLength="@arrayLength"
-                          tree="@simulatedTree" origin="@origin">
+                          numberOfTargets="1" arrayLength="5"
+                          tree="@simulatedTree" origin="@origin" missingRate="@lossRate" missingProbability="@lossProbability">
 
             <userDataType spec="beast.base.evolution.datatype.IntegerData"/>
 
@@ -53,11 +58,10 @@
                             spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel"
                             editProbabilities="@editProbs" >
                     <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies"  estimate="false">
-                        <frequencies id="frequencies" spec="parameter.SimplexParam" estimate="false"> 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
+                        <frequencies id="frequencies" spec="SimplexParam" estimate="false"> 1.0 0 0 0 0 0 0 0 0 0 0 0 0 0</frequencies>
                     </frequencies>
                 </substModel>
             </siteModel>
-            <branchRateModel id="StrictClock" spec="beast.base.spec.evolution.branchratemodel.StrictClockModel" clock.rate="1.0"/>
 
         </simulationObject>
 
