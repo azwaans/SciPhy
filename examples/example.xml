@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><beast beautitemplate='SciPhy' beautistatus='' namespace="beast.core:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.core.util:beast.evolution.nuc:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.base.evolution.alignment:beast.pkgmgmt:beast.base.core:beast.base.inference:beast.base.evolution.tree.coalescent:beast.pkgmgmt:beast.base.core:beast.base.inference.util:beast.evolution.nuc:beast.base.evolution.operator:beast.base.inference.operator:beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:beast.base.evolution.likelihood" required="" version="2.8">
+
+    <data
+            id="example_output"
+            spec="Alignment"
+            dataType="integer"
+            name="taxa">
+        <sequence id="seq_0" spec="Sequence" taxon="0" totalcount="-1" value="8,11,0,0,0"/>
+        <sequence id="seq_1" spec="Sequence" taxon="1" totalcount="-1" value="?,?,?,?,?"/>
+        <sequence id="seq_2" spec="Sequence" taxon="2" totalcount="-1" value="13,4,5,5,3"/>
+    </data>
+
+    <map name="LogUniform" >beast.base.spec.inference.distribution.LogUniform</map>
+
+    <map name="OffsetReal" >beast.base.spec.inference.distribution.OffsetReal</map>
+
+    <map name="Exponential" >beast.base.spec.inference.distribution.Exponential</map>
+
+    <map name="Uniform" >beast.base.spec.inference.distribution.Uniform</map>
+
+    <map name="Bernoulli" >beast.base.spec.inference.distribution.Bernoulli</map>
+
+    <map name="Beta" >beast.base.spec.inference.distribution.Beta</map>
+
+    <map name="Gamma" >beast.base.spec.inference.distribution.Gamma</map>
+
+    <map name="LaplaceDistribution" >beast.base.spec.inference.distribution.Laplace</map>
+
+    <map name="TruncatedReal" >beast.base.spec.inference.distribution.TruncatedReal</map>
+
+    <map name="IntUniform" >beast.base.spec.inference.distribution.IntUniform</map>
+
+    <map name="Dirichlet" >beast.base.spec.inference.distribution.Dirichlet</map>
+
+    <map name="InverseGamma" >beast.base.spec.inference.distribution.InverseGamma</map>
+
+    <map name="ChiSquare" >beast.base.spec.inference.distribution.ChiSquare</map>
+
+    <map name="GammaMean" >beast.base.spec.inference.distribution.GammaMean</map>
+
+    <map name="IID" >beast.base.spec.inference.distribution.IID</map>
+
+    <map name="OffsetInt" >beast.base.spec.inference.distribution.OffsetInt</map>
+
+    <map name="TruncatedInt" >beast.base.spec.inference.distribution.TruncatedInt</map>
+
+    <map name="LogNormal" >beast.base.spec.inference.distribution.LogNormal</map>
+
+    <map name="Normal" >beast.base.spec.inference.distribution.Normal</map>
+
+    <map name="Poisson" >beast.base.spec.inference.distribution.Poisson</map>
+
+    <map name="Cauchy" >beast.base.spec.inference.distribution.Cauchy</map>
+
+    <run id="mcmc" spec="MCMC" chainLength="10000000">
+        <state id="state" spec="State" storeEvery="5000">
+            <stateNode id="experimentLength.example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="24.0"/>
+            <stateNode id="Tree.t:example_output" spec="sciphy.evolution.tree.startingTree" originHeight="@experimentLength.example_output" sequencesAreClustered="false">
+                <taxa idref="example_output"/>
+                <stemLength id="RealScalarParam.0" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="0.1"/>
+                <editDuration id="RealScalarParam.1" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="5.0"/>
+                <editHeight id="RealScalarParam.2" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="20.0"/>
+                <trait id="dateTrait.t:example_output" spec="beast.base.evolution.tree.TraitSet" traitname="date" value="">
+                    <taxa id="TaxonSet.example_output" spec="TaxonSet" alignment="@example_output"/>
+                </trait>
+                <taxonset idref="TaxonSet.example_output"/>
+            </stateNode>
+            <stateNode id="BirthDiffRate.t:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" value="1.0"/>
+            <stateNode id="editProbabilities.s:example_output" spec="beast.base.spec.inference.parameter.SimplexParam" dimension="13" domain="UnitInterval">0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693 0.07692307692307693</stateNode>
+            <stateNode id="lossRate.s:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" value="1.0"/>
+            <stateNode id="lossProbability.s:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="UnitInterval" value="0.5"/>
+            <stateNode id="arrayLength.example_output" spec="beast.base.spec.inference.parameter.IntScalarParam" domain="Int" estimate="false" value="5"/>
+            <stateNode id="clockRate.c:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" value="1.0"/>
+        </state>
+        <distribution id="posterior" spec="CompoundDistribution">
+            <distribution id="prior" spec="CompoundDistribution">
+                <distribution id="YuleModel.t:example_output" spec="beast.base.spec.evolution.speciation.YuleModel" birthDiffRate="@BirthDiffRate.t:example_output" originHeight="@experimentLength.example_output" tree="@Tree.t:example_output"/>
+                <Uniform id="ClockPrior.c:example_output" name="distribution" param="@clockRate.c:example_output">
+                    <lower id="RealScalarParam.3" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
+                    <upper id="RealScalarParam.4" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="100.0"/>
+                </Uniform>
+                <Dirichlet id="EditProbabilitiesPrior.s:example_output" name="distribution" param="@editProbabilities.s:example_output">
+                    <alpha id="alpha.s:example_output" spec="beast.base.spec.inference.parameter.RealVectorParam" dimension="13" domain="PositiveReal">1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5</alpha>
+                </Dirichlet>
+                <Uniform id="OriginPrior.t:example_output" name="distribution" param="@experimentLength.example_output">
+                    <lower id="RealScalarParam.11" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
+                    <upper id="RealScalarParam.12" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="25.0"/>
+                </Uniform>
+                <Uniform id="YuleBirthDiffRatePrior.t:example_output" name="distribution" param="@BirthDiffRate.t:example_output">
+                    <lower id="RealScalarParam.9" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real"/>
+                    <upper id="RealScalarParam.10" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" value="100.0"/>
+                </Uniform>
+                <Beta id="lossProbabilityPrior.s:example_output" name="distribution" param="@lossProbability.s:example_output">
+                    <alpha id="RealScalarParam.74" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" estimate="false" value="2.0"/>
+                    <beta id="RealScalarParam.75" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" estimate="false" value="2.0"/>
+                </Beta>
+                <LogNormal id="lossRatePrior.s:example_output" name="distribution" param="@lossRate.s:example_output">
+                    <M id="RealScalarParam.76" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="Real" estimate="false" value="1.0"/>
+                    <S id="RealScalarParam.77" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="PositiveReal" estimate="false" value="1.25"/>
+                </LogNormal>
+            </distribution>
+            <distribution id="likelihood" spec="CompoundDistribution" useThreads="true">
+                <distribution id="SciPhyTreeLikelihood.example_output" spec="sciphy.evolution.likelihood.SciPhyTreeLikelihood" arrayLength="@arrayLength.example_output" data="@example_output" origin="@experimentLength.example_output" tree="@Tree.t:example_output" useScaling="true">
+                    <siteModel id="SiteModel.s:example_output" spec="beast.base.spec.evolution.sitemodel.SiteModel">
+                        <mutationRate id="mutationRate.s:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" estimate="false" value="1.0"/>
+                        <shape id="gammaShape.s:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" estimate="false" value="1.0"/>
+                        <proportionInvariant id="proportionInvariant.s:example_output" spec="beast.base.spec.inference.parameter.RealScalarParam" domain="NonNegativeReal" estimate="false"/>
+                        <substModel id="SciPhySubstmodel.s:example_output" spec="sciphy.evolution.substitutionmodel.SciPhySubstitutionModel" editProbabilities="@editProbabilities.s:example_output" missingProbability="@lossProbability.s:example_output" missingRate="@lossRate.s:example_output">
+                            <frequencies id="freq" spec="beast.base.spec.evolution.substitutionmodel.Frequencies" estimate="false">
+                                <frequencies id="frequencies" spec="beast.base.spec.inference.parameter.SimplexParam" dimension="13" domain="UnitInterval" estimate="false">1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0</frequencies>
+                            </frequencies>
+                        </substModel>
+                    </siteModel>
+                    <branchRateModel id="StrictClock.c:example_output" spec="beast.base.spec.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate.c:example_output"/>
+                </distribution>
+            </distribution>
+        </distribution>
+        <operator id="editProbabilitiesScaler.s:example_output" spec="beast.base.spec.inference.operator.DeltaExchangeOperator" delta="0.1" weight="4.0">
+            <parameter idref="editProbabilities.s:example_output"/>
+        </operator>
+        <operator id="lossRateScaler.s:example_output" spec="beast.base.spec.inference.operator.ScaleOperator" parameter="@lossRate.s:example_output" scaleFactor="0.5" weight="0.1"/>
+        <operator id="lossProbabilityScaler.s:example_output" spec="beast.base.spec.inference.operator.ScaleOperator" parameter="@lossProbability.s:example_output" scaleFactor="0.5" weight="0.1"/>
+        <operator id="YuleBirthDiffRateScaler.t:example_output" spec="beast.base.spec.inference.operator.ScaleOperator" parameter="@BirthDiffRate.t:example_output" weight="3.0"/>
+        <operator id="YuleModelTreeScaler.t:example_output" spec="beast.base.spec.evolution.operator.ScaleTreeOperator" scaleFactor="0.5" tree="@Tree.t:example_output" weight="3.0"/>
+        <operator id="YuleModelTreeRootScaler.t:example_output" spec="beast.base.spec.evolution.operator.ScaleTreeOperator" rootOnly="true" scaleFactor="0.5" tree="@Tree.t:example_output" weight="3.0"/>
+        <operator id="YuleModelUniformOperator.t:example_output" spec="Uniform" tree="@Tree.t:example_output" weight="30.0"/>
+        <operator id="YuleModelNarrow.t:example_output" spec="Exchange" tree="@Tree.t:example_output" weight="15.0"/>
+        <operator id="YuleModelWide.t:example_output" spec="Exchange" isNarrow="false" tree="@Tree.t:example_output" weight="3.0"/>
+        <operator id="YuleModelWilsonBalding.t:example_output" spec="WilsonBalding" tree="@Tree.t:example_output" weight="3.0"/>
+        <operator id="StrictClockRateScaler.c:example_output" spec="beast.base.spec.inference.operator.ScaleOperator" parameter="@clockRate.c:example_output" weight="3.0"/>
+        <operator id="strictClockUpDownOperator.c:example_output" spec="beast.base.spec.evolution.operator.UpDownOperator" scaleFactor="0.75" weight="3.0">
+            <up idref="clockRate.c:example_output"/>
+            <down idref="Tree.t:example_output"/>
+        </operator>
+        <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="1000" model="@posterior" sort="smart">
+            <log idref="posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+            <log idref="SciPhyTreeLikelihood.example_output"/>
+            <log id="TreeHeight.t:example_output" spec="beast.base.evolution.tree.TreeStatLogger" tree="@Tree.t:example_output"/>
+            <log idref="editProbabilities.s:example_output"/>
+            <log idref="lossRate.s:example_output"/>
+            <log idref="lossProbability.s:example_output"/>
+            <log idref="YuleModel.t:example_output"/>
+            <log idref="BirthDiffRate.t:example_output"/>
+            <log idref="clockRate.c:example_output"/>
+        </logger>
+        <logger id="screenlog" spec="Logger" logEvery="1000">
+            <log idref="posterior"/>
+            <log id="ESS.0" spec="beast.base.spec.inference.util.ESS" arg="@posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+        </logger>
+        <logger id="treelog.t:example_output" spec="Logger" fileName="$(filebase).trees" logEvery="1000" mode="tree">
+            <log id="TreeWithMetaDataLogger.t:example_output" spec="beast.base.spec.evolution.TreeWithMetaDataLogger" tree="@Tree.t:example_output"/>
+        </logger>
+    </run>
+
+</beast>
