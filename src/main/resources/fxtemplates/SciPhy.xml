@@ -230,8 +230,8 @@
             <distribution spec="beast.base.spec.inference.distribution.Uniform" id='ClockPrior.c:$(n)' param='@clockRate.c:$(n)' lower='0' upper='100'/>
             <distribution spec="beast.base.spec.inference.distribution.LogNormal" id='MutationRatePrior.s:$(n)' param='@mutationRate.s:$(n)'/>
 
-            <distribution spec="beast.base.spec.inference.distribution.LogNormal" id='lossRatePrior.s:$(n)' param='@lossRate.s:$(n)'/>
-            <distribution spec="beast.base.spec.inference.distribution.Beta" id='lossProbabilityPrior.s:$(n)' param='@lossProbability.s:$(n)'/>
+            <distribution spec="beast.base.spec.inference.distribution.Uniform" id='lossRatePrior.s:$(n)' param='@lossRate.s:$(n)' lower='0' upper='100'/>
+            <distribution spec="beast.base.spec.inference.distribution.Uniform" id='lossProbabilityPrior.s:$(n)' param='@lossProbability.s:$(n)' lower='0' upper='1.0'/>
 
             <distribution spec="beast.base.spec.inference.distribution.Uniform" id='YuleBirthDiffRatePrior.t:$(n)' param='@BirthDiffRate.t:$(n)' lower='0' upper='100'/>
             <distribution spec="beast.base.spec.inference.distribution.Uniform"  id="OriginPrior.t:$(n)" param="@experimentLength.$(n)" lower='0' upper='100' />
@@ -274,6 +274,10 @@
 
             <connect srcID='ClockPrior.c:$(n)'                targetID='prior' inputName='distribution' if='clockRate.c:$(n)/estimate=true'/>
             <connect srcID='EditProbabilitiesPrior.s:$(n)'    targetID='prior' inputName='distribution' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'/>
+            <connect srcID='lossRatePrior.s:$(n)'    targetID='prior' inputName='distribution' if='inlikelihood(lossRate.s:$(n)) and lossRate.s:$(n)/estimate=true'/>
+            <connect srcID='lossProbabilityPrior.s:$(n)'    targetID='prior' inputName='distribution' if='inlikelihood(lossProbability.s:$(n)) and lossProbability.s:$(n)/estimate=true'/>
+
+
             <!-- when FixMeanMutationRatesOperator, the prior is uniform due to the operator -->
             <connect srcID='MutationRatePrior.s:$(n)'         targetID='prior' inputName='distribution' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
 
@@ -282,12 +286,16 @@
             <connect srcID='BirthDiffRate.t:$(n)'                 targetID='state' inputName='stateNode' if='inposterior(YuleModel.t:$(n)) and inposterior(Tree.t:$(n)) and BirthDiffRate.t:$(n)/estimate=true'/>
             <connect srcID='clockRate.c:$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'/>
             <connect srcID='editProbabilities.s:$(n)'         targetID='state' inputName='stateNode' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'/>
+            <connect srcID='lossRate.s:$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(lossRate.s:$(n)) and lossRate.s:$(n)/estimate=true'/>
+            <connect srcID='lossProbability.s:$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(lossProbability.s:$(n)) and lossProbability.s:$(n)/estimate=true'/>
             <connect srcID='mutationRate.s:$(n)'              targetID='state' inputName='stateNode' if='inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
             <connect srcID='gammaShape.s:$(n)'                targetID='state' inputName='stateNode' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'/>
 
             <connect srcID='arrayLength.$(n)'                 targetID='state' inputName='stateNode' if='inlikelihood(arrayLength.$(n))'/>
 
             <connect srcID='editProbabilitiesScaler.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'>Changes the edit probabilities for partition s:$(n)</connect>
+            <connect srcID='lossRateScaler.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(lossRate.s:$(n)) and lossRate.s:$(n)/estimate=true'>Changes the loss rate for partition s:$(n)</connect>
+            <connect srcID='lossProbabilityScaler.s:$(n)'   targetID='mcmc' inputName='operator' if='inlikelihood(lossProbability.s:$(n)) and lossProbability.s:$(n)/estimate=true'>Changes the loss probability for partition s:$(n)</connect>
             <connect srcID='mutationRateScaler.s:$(n)'        targetID='mcmc' inputName='operator' if='nooperator(FixMeanMutationRatesOperator) and inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'>Scales mutation rate of partition s:$(n)</connect>
             <connect srcID='gammaShapeScaler.s:$(n)'          targetID='mcmc' inputName='operator' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'>Scales gamma shape parameter of partition s:$(n)</connect>
             <connect srcID='StrictClockRateScaler.c:$(n)'     targetID='mcmc' inputName='operator' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'>Scale clock rate of partition c:$(n)</connect>
@@ -310,6 +318,9 @@
             <connect srcID='SciPhyTreeLikelihood.$(n)'         targetID='tracelog' inputName='log' if='inlikelihood(SciPhyTreeLikelihood.$(n))'/>
             <connect srcID='TreeHeight.t:$(n)'                targetID='tracelog' inputName='log' if='inposterior(Tree.t:$(n))'/>
             <connect srcID='editProbabilities.s:$(n)'         targetID='tracelog' inputName='log' if='inlikelihood(editProbabilities.s:$(n)) and editProbabilities.s:$(n)/estimate=true'/>
+            <connect srcID='lossRate.s:$(n)'         targetID='tracelog' inputName='log' if='inlikelihood(lossRate.s:$(n)) and lossRate.s:$(n)/estimate=true'/>
+            <connect srcID='lossProbability.s:$(n)'         targetID='tracelog' inputName='log' if='inlikelihood(lossProbability.s:$(n)) and lossProbability.s:$(n)/estimate=true'/>
+
             <connect srcID='mutationRate.s:$(n)'              targetID='tracelog' inputName='log' if='inlikelihood(mutationRate.s:$(n)) and mutationRate.s:$(n)/estimate=true'/>
             <connect srcID='gammaShape.s:$(n)'                targetID='tracelog' inputName='log' if='inlikelihood(gammaShape.s:$(n)) and gammaShape.s:$(n)/estimate=true'/>
             <connect srcID='clockRate.c:$(n)'                 targetID='tracelog' inputName='log' if='inlikelihood(clockRate.c:$(n)) and clockRate.c:$(n)/estimate=true'/>
