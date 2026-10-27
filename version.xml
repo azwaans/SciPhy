@@ -1,4 +1,4 @@
-<package name="sciphy" version="1.0.0">
+<package name="sciphy" version="2.0.0">
     <depends on='BEAST.base' atleast='2.8.0'/>
     <depends on='BEAST.app' atleast='2.8.0'/>
     <depends on="feast" atleast="11.0.1"/>
